@@ -25,3 +25,166 @@
 .legal-copy{max-width:850px}.legal-copy h2{font-size:22px;margin:30px 0 8px}.legal-copy p{font-size:13px;line-height:1.8;color:#55645f}.legal-note{margin-top:35px;padding:16px;border-left:3px solid #0a5b49;background:#e9efeb}
 @media(max-width:900px){.route-hero-grid,.about-grid,.contact-grid,.solution-row{grid-template-columns:1fr}.route-hero-art{height:230px}.route-card-grid.three{grid-template-columns:repeat(2,1fr)}.process-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.route-hero{min-height:500px;padding:45px 0}.route-hero-grid{gap:15px}.route-hero h1{font-size:47px}.route-hero-art{height:180px}.route-orb{width:120px;height:120px}.route-ring{width:190px;height:80px}.route-ring.r2{width:155px;height:175px}.route-card-grid.three,.route-card-grid.two,.process-grid,.solution-points,.form-grid{grid-template-columns:1fr}.route-section-head{grid-template-columns:1fr}.route-cta .container{align-items:flex-start;flex-direction:column}}
+
+
+/* === Final six-page separation === */
+.six-page-app{min-height:100vh;background:#f6f4ef}
+.six-page-main{min-height:calc(100vh - 64px)}
+.six-page-screen{min-height:calc(100vh - 64px);overflow:hidden}
+.home-screen .px-hero{min-height:calc(100vh - 64px)}
+.services-screen{display:flex;align-items:center;background:#f6f4ef}
+.services-screen>.px-services{width:100%;padding:42px 0 48px;background:#f6f4ef}
+.services-screen .px-section-head{margin-bottom:24px}
+.services-screen .px-services-grid{gap:12px}
+.services-screen .px-service-card{min-height:230px;padding:24px 20px}
+
+.approach-screen{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  background:#062724;
+}
+.approach-screen>.px-system{
+  min-height:68vh;
+  display:flex;
+  align-items:center;
+  padding:46px 0;
+}
+.approach-screen .approach-bottom-strip>.px-approach{
+  padding:24px 0 26px;
+  min-height:auto;
+}
+.approach-screen .approach-bottom-strip .px-approach-head{margin-bottom:18px}
+.approach-screen .approach-bottom-strip .px-approach-copy,
+.approach-screen .approach-bottom-strip .px-text-link{display:none}
+
+.company-screen{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  background:#062c28;
+}
+.company-screen>.px-score{
+  min-height:70vh;
+  display:flex;
+  align-items:center;
+}
+.company-screen>.px-score>.container{width:100%}
+.company-screen .company-bottom-strip>.px-why{padding:24px 0 26px}
+
+.resources-screen{
+  background:
+    linear-gradient(110deg,rgba(248,246,240,.98),rgba(236,240,236,.92)),
+    url('/assets/alpine_landscape.jpg') center/cover fixed;
+  padding:64px 0 44px;
+}
+.resource-page-lead{padding-top:22px;padding-bottom:36px}
+.resource-page-lead h1{
+  font-size:clamp(48px,6vw,80px);
+  line-height:.95;
+  letter-spacing:-.055em;
+  color:#102023;
+  margin:10px 0 18px;
+}
+.resource-page-lead h1 span{color:#0a5b49}
+.resource-page-lead p{font-size:15px;color:#53635f;max-width:580px;line-height:1.65}
+.resources-screen>.px-resources{background:transparent;padding:0}
+.resources-screen .px-res-grid{grid-template-columns:repeat(2,1fr);gap:18px}
+.resources-screen .px-res-intro{display:none}
+.resources-screen .px-resource{
+  min-height:155px;
+  padding:18px;
+  grid-template-columns:120px 1fr;
+  box-shadow:0 16px 35px rgba(25,49,42,.07);
+}
+.resources-screen .px-resource img{width:120px;height:112px}
+.resources-screen .px-resource h4{font-size:17px}
+.resources-screen .px-resource p{font-size:12px;line-height:1.5}
+
+.contact-screen{
+  display:flex;
+  align-items:center;
+  padding:54px 0;
+  background:
+    linear-gradient(90deg,rgba(246,243,237,.98),rgba(231,237,233,.90)),
+    url('/assets/architecture_glass.jpg') center/cover no-repeat;
+}
+.contact-reference-grid{
+  display:grid;
+  grid-template-columns:1fr .92fr;
+  gap:70px;
+  align-items:center;
+}
+.contact-reference-copy h1{
+  font-size:clamp(48px,5.8vw,76px);
+  line-height:.95;
+  letter-spacing:-.055em;
+  color:#102023;
+  margin:12px 0 20px;
+}
+.contact-reference-copy h1 span{color:#0a5b49}
+.contact-reference-copy>p{font-size:14px;line-height:1.65;color:#52625d;max-width:560px}
+.contact-reference-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:34px}
+.contact-reference-cards>div{
+  padding:18px 15px;
+  background:rgba(255,255,255,.68);
+  border:1px solid rgba(12,40,35,.1);
+  min-height:145px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.contact-reference-cards svg{color:#0a5b49}
+.contact-reference-cards strong{font-size:12px;color:#132522}
+.contact-reference-cards span{font-size:9.5px;line-height:1.45;color:#5d6965}
+
+.contact-reference-form{
+  background:rgba(8,43,39,.94);
+  color:#fff;
+  padding:28px;
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 28px 60px rgba(8,31,27,.22);
+}
+.contact-form-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:9px;letter-spacing:.16em;color:#c5d8d0}
+.contact-form-head b{font:700 22px var(--font-mono);color:#88dfaa}
+.contact-reference-form label{display:grid;gap:7px;margin-bottom:14px;font-size:10px;font-weight:700;color:#d7e6df}
+.contact-reference-form input,
+.contact-reference-form textarea{
+  width:100%;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.055);
+  color:#fff;
+  padding:12px 13px;
+  outline:none;
+  border-radius:3px;
+}
+.contact-reference-form input::placeholder,
+.contact-reference-form textarea::placeholder{color:#8da49b}
+.contact-reference-form input:focus,
+.contact-reference-form textarea:focus{border-color:#68c997;box-shadow:0 0 0 3px rgba(104,201,151,.08)}
+.contact-reference-form button{
+  display:inline-flex;align-items:center;gap:8px;
+  border:0;background:#f3f0e9;color:#102023;
+  padding:11px 17px;border-radius:5px;font-size:11px;font-weight:800;cursor:pointer
+}
+.contact-form-ready{margin-top:12px;font-size:9px;line-height:1.5;color:#b9d9ca}
+
+.notfound-screen{display:grid;place-items:center;background:#f6f4ef}
+.notfound-screen h1{font-size:64px;letter-spacing:-.05em;margin:10px 0 20px}
+.notfound-screen a{display:inline-block;background:#0b312b;color:white;padding:11px 17px;border-radius:6px;font-size:11px;font-weight:800}
+
+@media(max-width:900px){
+  .approach-screen,.company-screen{display:block}
+  .approach-screen>.px-system,.company-screen>.px-score{min-height:auto}
+  .resources-screen .px-res-grid{grid-template-columns:1fr}
+  .contact-reference-grid{grid-template-columns:1fr;gap:32px}
+}
+@media(max-width:620px){
+  .services-screen{display:block}
+  .services-screen>.px-services{padding:26px 0}
+  .services-screen .px-services-grid{grid-template-columns:1fr}
+  .resources-screen{padding-top:35px}
+  .resource-page-lead h1,.contact-reference-copy h1{font-size:46px}
+  .resources-screen .px-resource{grid-template-columns:85px 1fr}
+  .resources-screen .px-resource img{width:85px;height:80px}
+  .contact-reference-cards{grid-template-columns:1fr}
+  .contact-reference-form{padding:20px}
+}
