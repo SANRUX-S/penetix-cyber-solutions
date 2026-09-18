@@ -1,0 +1,71 @@
+name: Restore Original PENETIX Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/restore-original.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract original website ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZIP="penetix-website.zip"
+          if [ ! -f "$ZIP" ]; then
+            echo "Original archive $ZIP was not found."
+            exit 1
+          fi
+
+          rm -rf /tmp/penetix-original
+          mkdir -p /tmp/penetix-original
+          unzip -q "$ZIP" -d /tmp/penetix-original
+
+          SRC="/tmp/penetix-original"
+          shopt -s dotglob nullglob
+          entries=(/tmp/penetix-original/*)
+
+          if [ "${#entries[@]}" -eq 1 ] && [ -d "${entries[0]}" ]; then
+            SRC="${entries[0]}"
+          fi
+
+          echo "Restoring from: $SRC"
+          echo "Archive contents:"
+          find "$SRC" -maxdepth 2 -type f | sort | head -200
+
+          # Remove the temporary site we created, while preserving Git metadata,
+          # this restore workflow, and the original ZIP backup.
+          find . -mindepth 1 -maxdepth 1             ! -name ".git"             ! -name ".github"             ! -name "penetix-website.zip"             -exec rm -rf {} +
+
+          cp -a "$SRC"/. ./
+
+          # Always preserve the original archive as a backup in the repository.
+          test -f penetix-website.zip
+
+      - name: Commit exact restored project
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "PENETIX Restore"
+          git config user.email "actions@github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Restore original PENETIX website from archived project"
+          git push origin HEAD:main
