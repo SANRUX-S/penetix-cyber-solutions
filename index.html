@@ -6,25 +6,95 @@
     <meta name="theme-color" content="#f1eee8" />
     <meta name="description" content="PENETIX — practical cybersecurity for modern businesses." />
     <title>PENETIX — Security without the noise</title>
-    <style>
-      html,body{margin:0;min-height:100%;background:#f1eee8;color:#172129;font-family:Arial,sans-serif}
-      #boot-fallback{min-height:100vh;display:grid;place-items:center;padding:32px;background:linear-gradient(135deg,#f1eee8,#dfe6e3)}
-      #boot-fallback>div{max-width:760px}
-      #boot-fallback small{letter-spacing:.22em;color:#5a686d}
-      #boot-fallback h1{font-size:clamp(44px,8vw,84px);line-height:.95;margin:18px 0}
-      #boot-fallback p{color:#5b666b;font-size:18px;line-height:1.6}
-    </style>
+    <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
-    <div id="root">
-      <div id="boot-fallback">
-        <div>
-          <small>PENETIX · CYBERSECURITY FOR MODERN BUSINESSES</small>
-          <h1>Security without the noise.</h1>
-          <p>Loading the PENETIX experience…</p>
+    <main>
+      <header class="nav-wrap">
+        <nav class="nav">
+          <a class="brand" href="#" aria-label="PENETIX home">
+            <span class="brand-mark">P</span>
+            <span>
+              <strong>PENETIX</strong>
+              <small>SECURE TODAY. STRONGER TOMORROW.</small>
+            </span>
+          </a>
+
+          <div class="nav-links">
+            <a class="active" href="#">Home</a>
+            <a href="#services">Services</a>
+            <a href="#approach">Approach</a>
+            <a href="#company">Company</a>
+            <a href="#resources">Resources</a>
+            <a href="#contact">Contact</a>
+          </div>
+
+          <div class="nav-actions">
+            <span class="availability"><i></i>Available for Security Assessments</span>
+            <a class="nav-cta" href="#contact">Start an Assessment <span>→</span></a>
+          </div>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">CYBERSECURITY FOR MODERN BUSINESSES</p>
+          <h1>
+            Security without<br />
+            the noise.
+            <span>Clarity. Protection. <em>Confidence.</em></span>
+          </h1>
+
+          <p class="lead">
+            Practical cybersecurity assessments, hardening and risk reduction for growing businesses.
+          </p>
+          <p class="sublead">
+            Understand your exposure. Fix what matters. Build stronger security.
+          </p>
+
+          <div class="hero-actions">
+            <a class="primary-btn" href="#contact">Start a Security Review <span>→</span></a>
+            <a class="secondary-btn" href="#approach"><b>▶</b> Watch Our Story</a>
+          </div>
+
+          <div class="trust-row">
+            <span>✓ <b>Clear Reporting</b></span>
+            <span>♙ <b>Business Focused</b></span>
+            <span>♙ <b>Confidential by Design</b></span>
+          </div>
         </div>
-      </div>
-    </div>
-    <script type="module" src="/src/main.jsx"></script>
+
+        <div class="visual-shell" aria-label="Interactive PENETIX security core">
+          <div class="system-label">
+            <strong>PENETIX</strong>
+            <span>SECURITY SYSTEM 001</span>
+          </div>
+          <div id="security-core" class="security-core">
+            <div class="core-fallback-mark">
+              <span></span>
+              <strong>PENETIX</strong>
+              <small>SECURITY CORE</small>
+            </div>
+          </div>
+          <div class="visual-rail">
+            <span>ASSESS</span>
+            <span>HARDEN</span>
+            <span>PROTECT</span>
+            <span>IMPROVE</span>
+          </div>
+          <div class="visual-quote">A SAFER DIGITAL WORLD BUILDS BRIGHTER TOMORROWS.</div>
+        </div>
+      </section>
+
+      <section class="service-preview" id="services">
+        <div>
+          <p class="eyebrow">WHAT WE DO</p>
+          <h2>Practical cybersecurity for real businesses.</h2>
+        </div>
+        <p>Focused security reviews designed to identify meaningful risk and give businesses a clear path forward.</p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
