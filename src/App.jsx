@@ -12,97 +12,59 @@ import { Footer } from './components/Footer';
 import { AssessmentModal } from './components/AssessmentModal';
 import { SampleReportModal } from './components/SampleReportModal';
 import { VideoModal } from './components/VideoModal';
+import {
+  ServicesPage, HostingPage, SolutionsPage, AboutPage, ContactPage, StartProjectPage,
+  ResourcesPage, PrivacyPage, TermsPage, SecurityAuthorizationPage, NotFoundPage
+} from './pages/SitePages';
 
-export function App() {
-  const [assessmentModalOpen, setAssessmentModalOpen] = useState(false);
-  const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [videoModalOpen, setVideoModalOpen] = useState(false);
-
-  const handleOpenAssessment = () => {
-    setAssessmentModalOpen(true);
-  };
-
-  const handleOpenReport = () => {
-    setReportModalOpen(true);
-  };
-
-  const handleOpenVideo = () => {
-    setVideoModalOpen(true);
-  };
-
-  const handleSelectService = (service) => {
-    setAssessmentModalOpen(true);
-  };
-
-  const handleSelectResource = (resource) => {
-    alert(`Viewing Resource: "${resource.title}". In production, this opens the full technical whitepaper or security checklist.`);
-  };
-
-  const handleScrollToApproach = () => {
-    const el = document.getElementById('approach-timeline');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
-      {/* Top Fixed / Sticky Navigation */}
-      <Navbar onOpenAssessment={handleOpenAssessment} />
-
-      {/* Main Page Body */}
-      <main style={{ flex: 1 }}>
-        {/* Hero Section with 3D Chrome Sphere Visual & Alpine Panorama */}
-        <Hero
-          onOpenAssessment={handleOpenAssessment}
-          onWatchStory={handleOpenVideo}
-        />
-
-        {/* 6 Services Grid Section */}
-        <ServicesGrid onSelectService={handleSelectService} />
-
-        {/* 3D Interactive Defense System Radar Section ("Security is a system") */}
-        <SecuritySystemOrbit onExploreApproach={handleScrollToApproach} />
-
-        {/* Structured 4-Step Approach Timeline */}
-        <ApproachTimeline onLearnMore={handleScrollToApproach} />
-
-        {/* Security Posture Dashboard & Sample Review Showcase */}
-        <SecurityScorecard onViewSampleReport={handleOpenReport} />
-
-        {/* 4 Value Pillars: Why Penetix */}
-        <WhyPenetix />
-
-        {/* Educational Resources & Guides */}
-        <ResourcesSection onSelectResource={handleSelectResource} />
-
-        {/* Dark Pre-Footer Call-To-Action Banner */}
-        <PreFooterCta
-          onOpenAssessment={handleOpenAssessment}
-          onContact={handleOpenAssessment}
-        />
-      </main>
-
-      {/* Corporate Multi-Column Footer */}
-      <Footer />
-
-      {/* Interactive Modals */}
-      <AssessmentModal
-        isOpen={assessmentModalOpen}
-        onClose={() => setAssessmentModalOpen(false)}
-      />
-
-      <SampleReportModal
-        isOpen={reportModalOpen}
-        onClose={() => setReportModalOpen(false)}
-      />
-
-      <VideoModal
-        isOpen={videoModalOpen}
-        onClose={() => setVideoModalOpen(false)}
-      />
-    </div>
-  );
+function HomePage(){
+  const [assessmentModalOpen,setAssessmentModalOpen]=useState(false);
+  const [reportModalOpen,setReportModalOpen]=useState(false);
+  const [videoModalOpen,setVideoModalOpen]=useState(false);
+  const openAssessment=()=>setAssessmentModalOpen(true);
+  const scrollApproach=()=>document.getElementById('approach-timeline')?.scrollIntoView({behavior:'smooth'});
+  return <>
+    <Navbar onOpenAssessment={openAssessment}/>
+    <main>
+      <Hero onOpenAssessment={openAssessment} onWatchStory={()=>setVideoModalOpen(true)}/>
+      <ServicesGrid onSelectService={openAssessment}/>
+      <SecuritySystemOrbit onExploreApproach={scrollApproach}/>
+      <ApproachTimeline onLearnMore={scrollApproach}/>
+      <SecurityScorecard onViewSampleReport={()=>setReportModalOpen(true)}/>
+      <WhyPenetix/>
+      <ResourcesSection onSelectResource={()=>{window.location.href='/resources'}}/>
+      <PreFooterCta onOpenAssessment={openAssessment} onContact={()=>{window.location.href='/contact'}}/>
+    </main>
+    <Footer/>
+    <AssessmentModal isOpen={assessmentModalOpen} onClose={()=>setAssessmentModalOpen(false)}/>
+    <SampleReportModal isOpen={reportModalOpen} onClose={()=>setReportModalOpen(false)}/>
+    <VideoModal isOpen={videoModalOpen} onClose={()=>setVideoModalOpen(false)}/>
+  </>
 }
 
+const routeMap={
+  '/services':ServicesPage,
+  '/hosting':HostingPage,
+  '/solutions':SolutionsPage,
+  '/approach':SolutionsPage,
+  '/about':AboutPage,
+  '/company':AboutPage,
+  '/contact':ContactPage,
+  '/start-project':StartProjectPage,
+  '/resources':ResourcesPage,
+  '/privacy':PrivacyPage,
+  '/terms':TermsPage,
+  '/security-authorization':SecurityAuthorizationPage,
+};
+
+export function App(){
+  const path=(window.location.pathname.replace(/\/+$/,'')||'/').toLowerCase();
+  if(path==='/') return <HomePage/>;
+  const Page=routeMap[path]||NotFoundPage;
+  return <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
+    <Navbar/>
+    <Page/>
+    <Footer/>
+  </div>
+}
 export default App;
