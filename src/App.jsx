@@ -3,7 +3,6 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ServicesGrid } from './components/ServicesGrid';
 import { SecuritySystemOrbit } from './components/SecuritySystemOrbit';
-import { ApproachTimeline } from './components/ApproachTimeline';
 import { SecurityScorecard } from './components/SecurityScorecard';
 import { WhyPenetix } from './components/WhyPenetix';
 import { ResourcesSection } from './components/ResourcesSection';
@@ -12,59 +11,93 @@ import { Footer } from './components/Footer';
 import { AssessmentModal } from './components/AssessmentModal';
 import { SampleReportModal } from './components/SampleReportModal';
 import { VideoModal } from './components/VideoModal';
-import {
-  ServicesPage, HostingPage, SolutionsPage, AboutPage, ContactPage, StartProjectPage,
-  ResourcesPage, PrivacyPage, TermsPage, SecurityAuthorizationPage, NotFoundPage
-} from './pages/SitePages';
+import { ContactPage, NotFoundPage } from './pages/SitePages';
 
 function HomePage(){
   const [assessmentModalOpen,setAssessmentModalOpen]=useState(false);
-  const [reportModalOpen,setReportModalOpen]=useState(false);
   const [videoModalOpen,setVideoModalOpen]=useState(false);
-  const openAssessment=()=>setAssessmentModalOpen(true);
-  const scrollApproach=()=>document.getElementById('approach-timeline')?.scrollIntoView({behavior:'smooth'});
   return <>
-    <Navbar onOpenAssessment={openAssessment}/>
-    <main>
-      <Hero onOpenAssessment={openAssessment} onWatchStory={()=>setVideoModalOpen(true)}/>
-      <ServicesGrid onSelectService={openAssessment}/>
-      <SecuritySystemOrbit onExploreApproach={scrollApproach}/>
-      <ApproachTimeline onLearnMore={scrollApproach}/>
-      <SecurityScorecard onViewSampleReport={()=>setReportModalOpen(true)}/>
-      <WhyPenetix/>
-      <ResourcesSection onSelectResource={()=>{window.location.href='/resources'}}/>
-      <PreFooterCta onOpenAssessment={openAssessment} onContact={()=>{window.location.href='/contact'}}/>
+    <main style={{flex:1}}>
+      <Hero onOpenAssessment={()=>setAssessmentModalOpen(true)} onWatchStory={()=>setVideoModalOpen(true)}/>
     </main>
     <Footer/>
     <AssessmentModal isOpen={assessmentModalOpen} onClose={()=>setAssessmentModalOpen(false)}/>
-    <SampleReportModal isOpen={reportModalOpen} onClose={()=>setReportModalOpen(false)}/>
     <VideoModal isOpen={videoModalOpen} onClose={()=>setVideoModalOpen(false)}/>
-  </>
+  </>;
 }
 
-const routeMap={
-  '/services':ServicesPage,
-  '/hosting':HostingPage,
-  '/solutions':SolutionsPage,
-  '/approach':SolutionsPage,
-  '/about':AboutPage,
-  '/company':AboutPage,
-  '/contact':ContactPage,
-  '/start-project':StartProjectPage,
-  '/resources':ResourcesPage,
-  '/privacy':PrivacyPage,
-  '/terms':TermsPage,
-  '/security-authorization':SecurityAuthorizationPage,
-};
+function ServicesPage(){
+  const [assessmentModalOpen,setAssessmentModalOpen]=useState(false);
+  return <>
+    <main style={{flex:1}} className="single-route-page">
+      <ServicesGrid onSelectService={()=>setAssessmentModalOpen(true)}/>
+    </main>
+    <Footer/>
+    <AssessmentModal isOpen={assessmentModalOpen} onClose={()=>setAssessmentModalOpen(false)}/>
+  </>;
+}
+
+function ApproachPage(){
+  return <>
+    <main style={{flex:1}} className="single-route-page">
+      <SecuritySystemOrbit onExploreApproach={()=>{}}/>
+    </main>
+    <Footer/>
+  </>;
+}
+
+function CompanyPage(){
+  const [reportModalOpen,setReportModalOpen]=useState(false);
+  return <>
+    <main style={{flex:1}} className="single-route-page">
+      <SecurityScorecard onViewSampleReport={()=>setReportModalOpen(true)}/>
+      <WhyPenetix/>
+    </main>
+    <Footer/>
+    <SampleReportModal isOpen={reportModalOpen} onClose={()=>setReportModalOpen(false)}/>
+  </>;
+}
+
+function ResourcesPage(){
+  return <>
+    <main style={{flex:1}} className="single-route-page">
+      <ResourcesSection onSelectResource={()=>{}}/>
+    </main>
+    <Footer/>
+  </>;
+}
+
+function ContactRoute(){
+  return <>
+    <main style={{flex:1}} className="single-route-page">
+      <ContactPage/>
+      <PreFooterCta onOpenAssessment={()=>{window.location.href='/contact'}} onContact={()=>{window.location.href='/contact'}}/>
+    </main>
+    <Footer/>
+  </>;
+}
 
 export function App(){
-  const path=(window.location.pathname.replace(/\/+$/,'')||'/').toLowerCase();
-  if(path==='/') return <HomePage/>;
-  const Page=routeMap[path]||NotFoundPage;
+  let path=(window.location.pathname.replace(/\/+$/,'')||'/').toLowerCase();
+
+  // Keep older public URLs working while the visible site uses the six-page reference structure.
+  if(path==='/hosting') { window.history.replaceState({},'', '/services'); path='/services'; }
+  if(path==='/solutions') { window.history.replaceState({},'', '/approach'); path='/approach'; }
+  if(path==='/about') { window.history.replaceState({},'', '/company'); path='/company'; }
+  if(path==='/start-project') { window.history.replaceState({},'', '/contact'); path='/contact'; }
+
+  let page;
+  if(path==='/') page=<HomePage/>;
+  else if(path==='/services') page=<ServicesPage/>;
+  else if(path==='/approach') page=<ApproachPage/>;
+  else if(path==='/company') page=<CompanyPage/>;
+  else if(path==='/resources') page=<ResourcesPage/>;
+  else if(path==='/contact') page=<ContactRoute/>;
+  else page=<><main style={{flex:1}}><NotFoundPage/></main><Footer/></>;
+
   return <div style={{minHeight:'100vh',display:'flex',flexDirection:'column'}}>
-    <Navbar/>
-    <Page/>
-    <Footer/>
-  </div>
+    <Navbar onOpenAssessment={()=>{window.location.href='/contact'}}/>
+    {page}
+  </div>;
 }
 export default App;
