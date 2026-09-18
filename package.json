@@ -1,7 +1,7 @@
 {
-  "name": "screen-recordings",
+  "name": "penetix-cyber-solutions",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,8 @@
   "dependencies": {
     "lucide-react": "^1.47.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",
