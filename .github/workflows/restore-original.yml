@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract original website ZIP
+      - name: Extract original website ZIP safely
         shell: bash
         run: |
           set -euo pipefail
@@ -31,7 +31,33 @@ jobs:
 
           rm -rf /tmp/penetix-original
           mkdir -p /tmp/penetix-original
-          unzip -q "$ZIP" -d /tmp/penetix-original
+
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          import zipfile
+
+          archive = Path("penetix-website.zip")
+          out = Path("/tmp/penetix-original").resolve()
+
+          with zipfile.ZipFile(archive) as zf:
+              for info in zf.infolist():
+                  # The original archive was created on Windows and uses backslashes.
+                  raw = info.filename.replace("\\", "/")
+                  parts = [p for p in PurePosixPath(raw).parts if p not in ("", ".")]
+                  if not parts:
+                      continue
+                  if any(p == ".." for p in parts):
+                      raise RuntimeError(f"Unsafe archive path: {info.filename}")
+
+                  target = out.joinpath(*parts)
+                  if info.is_dir() or raw.endswith("/"):
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with zf.open(info) as src, open(target, "wb") as dst:
+                      dst.write(src.read())
+          PY
 
           SRC="/tmp/penetix-original"
           shopt -s dotglob nullglob
@@ -43,15 +69,12 @@ jobs:
 
           echo "Restoring from: $SRC"
           echo "Archive contents:"
-          find "$SRC" -maxdepth 2 -type f | sort | head -200
+          find "$SRC" -maxdepth 3 -type f | sort | head -250
 
-          # Remove the temporary site we created, while preserving Git metadata,
-          # this restore workflow, and the original ZIP backup.
           find . -mindepth 1 -maxdepth 1             ! -name ".git"             ! -name ".github"             ! -name "penetix-website.zip"             -exec rm -rf {} +
 
           cp -a "$SRC"/. ./
 
-          # Always preserve the original archive as a backup in the repository.
           test -f penetix-website.zip
 
       - name: Commit exact restored project
