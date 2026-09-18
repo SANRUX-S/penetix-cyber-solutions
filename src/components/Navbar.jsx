@@ -3,206 +3,37 @@ import { PenetixLogo } from './BrandLogo';
 import { ArrowRight, Menu, X } from 'lucide-react';
 
 export function Navbar({ onOpenAssessment }) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinks = [
-    { label: 'Home', href: '#home' },
-    { label: 'Services', href: '#services' },
-    { label: 'Approach', href: '#approach' },
-    { label: 'Company', href: '#company' },
-    { label: 'Resources', href: '#resources' },
-    { label: 'Contact', href: '#contact' },
+  const [isScrolled,setIsScrolled]=useState(false);
+  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+  const path=(window.location.pathname.replace(/\/+$/,'')||'/').toLowerCase();
+  useEffect(()=>{const f=()=>setIsScrolled(window.scrollY>20);f();window.addEventListener('scroll',f);return()=>window.removeEventListener('scroll',f)},[]);
+  const links=[
+    ['Home','/'],['Services','/services'],['Hosting','/hosting'],['Solutions','/solutions'],['About','/about'],['Contact','/contact']
   ];
-
-  return (
-    <header
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        backgroundColor: isScrolled ? 'rgba(251, 251, 249, 0.92)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(16px)' : 'none',
-        WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
-        borderBottom: isScrolled ? '1px solid rgba(0, 0, 0, 0.06)' : '1px solid transparent',
-        transition: 'all 0.3s ease',
-        padding: '16px 0',
-      }}
-    >
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {/* Brand Logo */}
-        <a href="#home" style={{ display: 'flex', alignItems: 'center' }}>
-          <PenetixLogo variant="dark" />
-        </a>
-
-        {/* Desktop Navigation Links */}
-        <nav
-          style={{
-            display: 'none',
-            alignItems: 'center',
-            gap: '32px',
-          }}
-          className="desktop-nav"
-        >
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              style={{
-                fontSize: '0.86rem',
-                fontWeight: link.label === 'Home' ? '600' : '400',
-                color: link.label === 'Home' ? '#111827' : '#4b5563',
-                transition: 'color var(--transition-fast)',
-                position: 'relative',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#111827')}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = link.label === 'Home' ? '#111827' : '#4b5563')
-              }
-            >
-              {link.label}
-              {link.label === 'Home' && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    bottom: '-6px',
-                    left: 0,
-                    right: 0,
-                    height: '2px',
-                    backgroundColor: '#111827',
-                    borderRadius: '1px',
-                  }}
-                />
-              )}
-            </a>
-          ))}
-        </nav>
-
-        {/* Right Actions: Status Badge & Assessment Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {/* Status Badge */}
-          <div
-            className="status-pill status-pill-desktop"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-          >
-            <div className="status-dot-pulse" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#374151' }}>
-              Available for Security Assessments
-            </span>
-          </div>
-
-          {/* CTA Button */}
-          <button
-            onClick={onOpenAssessment}
-            className="btn-primary"
-            style={{
-              padding: '9px 18px',
-              fontSize: '0.82rem',
-              fontWeight: 500,
-            }}
-          >
-            <span>Start an Assessment</span>
-            <ArrowRight size={14} />
-          </button>
-
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="mobile-toggle-btn"
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'none',
-              padding: '6px',
-              color: '#111827',
-            }}
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
+  const goStart=()=>{ if(onOpenAssessment && path==='/') onOpenAssessment(); else window.location.href='/start-project'; };
+  return <header style={{position:'sticky',top:0,zIndex:50,backgroundColor:isScrolled?'rgba(248,246,241,.94)':'rgba(248,246,241,.88)',backdropFilter:'blur(16px)',borderBottom:'1px solid rgba(12,40,35,.08)',transition:'all .3s',padding:'10px 0'}}>
+    <div className="container" style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:20}}>
+      <a href="/" style={{display:'flex',alignItems:'center'}}><PenetixLogo variant="dark"/></a>
+      <nav className="desktop-nav" style={{display:'none',alignItems:'center',gap:28}}>
+        {links.map(([label,href])=><a key={href} href={href} style={{fontSize:'.76rem',fontWeight:path===href?700:500,color:path===href?'#0b312b':'#52605d',position:'relative'}}>
+          {label}{path===href&&<span style={{position:'absolute',left:0,right:0,bottom:-9,height:2,background:'#0b5142'}}/>}
+        </a>)}
+      </nav>
+      <div style={{display:'flex',alignItems:'center',gap:18}}>
+        <div className="status-pill status-pill-desktop"><div className="status-dot-pulse"/><span style={{fontSize:'.68rem'}}>Available for Security Assessments</span></div>
+        <button onClick={goStart} className="btn-primary" style={{padding:'9px 17px',fontSize:'.72rem',borderRadius:8}}>Start an Assessment <ArrowRight size={13}/></button>
+        <button className="mobile-toggle-btn" onClick={()=>setMobileMenuOpen(v=>!v)} style={{display:'none',border:0,background:'transparent',padding:5}}>{mobileMenuOpen?<X size={21}/>:<Menu size={21}/>}</button>
       </div>
-
-      {/* Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            backgroundColor: '#ffffff',
-            borderBottom: '1px solid var(--border-subtle)',
-            padding: '24px 28px',
-            boxShadow: '0 12px 24px rgba(0, 0, 0, 0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-          }}
-        >
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                fontSize: '1rem',
-                fontWeight: 500,
-                color: '#111827',
-                padding: '8px 0',
-                borderBottom: '1px solid #f3f4f6',
-              }}
-            >
-              {link.label}
-            </a>
-          ))}
-          <div style={{ paddingTop: '8px' }}>
-            <div className="status-pill" style={{ marginBottom: '16px' }}>
-              <div className="status-dot-pulse" />
-              <span>Available for Security Assessments</span>
-            </div>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAssessment();
-              }}
-              className="btn-primary"
-              style={{ width: '100%', justifyContent: 'center' }}
-            >
-              <span>Start an Assessment</span>
-              <ArrowRight size={14} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @media (min-width: 900px) {
-          .desktop-nav {
-            display: flex !important;
-          }
-          .mobile-toggle-btn {
-            display: none !important;
-          }
-        }
-        @media (max-width: 899px) {
-          .status-pill-desktop {
-            display: none !important;
-          }
-          .mobile-toggle-btn {
-            display: block !important;
-          }
-        }
-      `}</style>
-    </header>
-  );
+    </div>
+    {mobileMenuOpen&&<div className="mobile-nav-panel">
+      {links.map(([label,href])=><a key={href} href={href}>{label}</a>)}
+      <a href="/start-project">Start a Project</a>
+    </div>}
+    <style>{`
+      .mobile-nav-panel{position:absolute;top:100%;left:12px;right:12px;background:#f8f6f1;border:1px solid rgba(12,40,35,.1);box-shadow:0 15px 30px rgba(15,40,35,.12);padding:12px;display:grid;gap:4px}
+      .mobile-nav-panel a{padding:11px 10px;border-bottom:1px solid rgba(12,40,35,.07);font-size:13px;font-weight:650}
+      @media(min-width:900px){.desktop-nav{display:flex!important}.mobile-toggle-btn{display:none!important}}
+      @media(max-width:899px){.status-pill-desktop{display:none!important}.mobile-toggle-btn{display:block!important}}
+    `}</style>
+  </header>
 }
