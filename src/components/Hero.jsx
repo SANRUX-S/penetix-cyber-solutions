@@ -1,9 +1,11 @@
 import React from 'react';
 import { ArrowRight, Play, ShieldCheck, Users, Lock } from 'lucide-react';
+import { HeroSphere3D } from './HeroSphere3D';
 
 export function Hero({ onOpenAssessment, onWatchStory }) {
   return (
-    <section id="home" className="px-hero">
+    <section id="home" className="px-hero px-hero-standalone">
+      <div className="px-hero-architecture" aria-hidden="true"/>
       <div className="container px-hero-inner">
         <div className="px-hero-copy">
           <div className="px-kicker">CYBERSECURITY FOR MODERN BUSINESSES</div>
@@ -33,8 +35,12 @@ export function Hero({ onOpenAssessment, onWatchStory }) {
           </div>
         </div>
 
+        <div className="px-hero-3d-wrap">
+          <div className="px-hero-floor-shadow" aria-hidden="true"/>
+          <HeroSphere3D/>
+        </div>
+
         <div className="px-meta">PENETIX<br/><span style={{fontSize:7}}>SECURITY SYSTEM 001</span></div>
-        <div className="px-sphere" aria-hidden="true"/>
         <div className="px-side-label">ASSESS<br/>HARDEN<br/>PROTECT<br/>IMPROVE<br/><span style={{display:'inline-block',width:18,borderTop:'1px solid rgba(255,255,255,.65)',marginTop:8}}/></div>
         <div className="px-side-number">01</div>
         <div className="px-side-caption">A SAFER<br/>DIGITAL WORLD<br/>BUILDS BRIGHTER<br/>TOMORROWS.</div>
