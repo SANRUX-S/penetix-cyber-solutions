@@ -29,18 +29,19 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 32, background: '#0a0a0c', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-          <h2 style={{ color: '#ef4444', marginBottom: 12 }}>⚠️ Something went wrong in the application</h2>
-          <p style={{ color: '#fbbf24', fontSize: 16 }}>{String(this.state.error?.message || this.state.error)}</p>
-          <pre style={{ background: '#18181b', padding: 16, borderRadius: 8, overflow: 'auto', fontSize: 13, color: '#e4e4e7', marginTop: 16 }}>
-            {this.state.error?.stack}
-          </pre>
-          <button
-            onClick={() => { window.location.hash = '#home'; window.location.reload(); }}
-            style={{ marginTop: 20, padding: '10px 24px', background: '#fff', color: '#000', border: 'none', borderRadius: 9999, fontWeight: 600, cursor: 'pointer' }}
-          >
-            Reset to Home
-          </button>
+        <div style={{ padding: 32, background: '#0a0a0c', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif', display: 'grid', placeItems: 'center' }}>
+          <div style={{ maxWidth: 560, textAlign: 'center' }}>
+            <h2 style={{ marginBottom: 12 }}>Something went wrong</h2>
+            <p style={{ color: '#a1a1aa', lineHeight: 1.6 }}>
+              We could not load this page correctly. Please refresh and try again.
+            </p>
+            <button
+              onClick={() => { window.history.replaceState({}, '', '/'); window.location.reload(); }}
+              style={{ marginTop: 20, padding: '10px 24px', background: '#fff', color: '#000', border: 'none', borderRadius: 9999, fontWeight: 600, cursor: 'pointer' }}
+            >
+              Return Home
+            </button>
+          </div>
         </div>
       );
     }
