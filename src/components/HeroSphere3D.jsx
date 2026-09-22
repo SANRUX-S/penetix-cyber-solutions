@@ -110,25 +110,31 @@ export function sampleSecuritySequence(timeSeconds) {
 }
 // security-sequence:end
 
-// Closed bevelled metal sheets follow a sphere, with a gently raked path that
-// breaks axial symmetry. Broad surfaces, not torus tubes or separate tiles.
-function ribbonPoint(longitude, across, { latitude, halfWidth, radius, rake = .11, phase = 0, lap = 0 }, depth = 0) {
-  const wave = rake * Math.cos(latitude) * (Math.sin(longitude + phase) + .22 * Math.sin(2 * longitude - .4));
-  const center = latitude + wave;
-  const lower = THREE.MathUtils.clamp(center - halfWidth, -Math.PI / 2 + .002, Math.PI / 2 - .002);
-  const upper = THREE.MathUtils.clamp(center + halfWidth, -Math.PI / 2 + .002, Math.PI / 2 - .002);
-  const fraction = (across + 1) / 2;
-  // Gently crowned, lapped faces: continuous spherical silhouette, but each
-  // sheet gets its own reflection instead of shading as one glossy ball.
-  const r = radius + lap * across - .003 * Math.pow(Math.abs(across), 18) - depth;
-  const angle = THREE.MathUtils.lerp(lower, upper, fraction);
-  const radial = r * THREE.MathUtils.lerp(Math.cos(angle), THREE.MathUtils.lerp(Math.cos(lower), Math.cos(upper), fraction), .3);
-  const y = r * THREE.MathUtils.lerp(Math.sin(angle), THREE.MathUtils.lerp(Math.sin(lower), Math.sin(upper), fraction), .3);
-  return new THREE.Vector3(radial * Math.sin(longitude), y, radial * Math.cos(longitude));
+// Integer speed multipliers keep the existing 30-second security cycle seamless.
+const SHELL_SPEED = 6;
+
+// A crowned spherical sheet with a swept centerline. Every point follows the
+// round shell, including the width of the ribbon (there are no flat chords).
+function ribbonPoint(longitude, across, { latitude, halfWidth, radius, rake = .16, phase = 0, lap = 0 }, depth = 0) {
+  const wave = rake * Math.cos(latitude) * (Math.sin(longitude + phase) + .18 * Math.sin(2 * longitude + phase));
+  const width = halfWidth * (1 + .1 * Math.sin(2 * longitude + phase));
+  const sweep = latitude + wave + across * width;
+  // Ease the innermost sheets around the viewing aperture instead of allowing
+  // a broad straight strip to close over the light during a revolution.
+  const aperture = .22;
+  const curved = Math.abs(latitude) < .5 && halfWidth > .05
+    ? Math.sign(latitude) * (aperture + Math.log1p(Math.exp((Math.sign(latitude) * sweep - aperture) * 22)) / 22)
+    : sweep;
+  const angle = THREE.MathUtils.clamp(curved, -Math.PI / 2 + .002, Math.PI / 2 - .002);
+  const crown = .014 * (1 - across * across);
+  const r = radius + lap * across + crown - depth;
+  const radial = r * Math.cos(angle);
+  return new THREE.Vector3(radial * Math.sin(longitude), r * Math.sin(angle), radial * Math.cos(longitude));
 }
 
-function createRibbon(settings, segments, crossSegments = 10) {
+function createRibbon(settings, segments, crossSegments = 16) {
   const positions = [], uvs = [], indices = [], groups = [];
+  const thickness = .024, bevel = .065;
   function surface(rows, point, reverse, materialIndex) {
     const start = positions.length / 3, firstIndex = indices.length;
     for (let row = 0; row <= rows; row += 1) {
@@ -146,16 +152,29 @@ function createRibbon(settings, segments, crossSegments = 10) {
     }
     groups.push([firstIndex, indices.length - firstIndex, materialIndex]);
   }
-  surface(crossSegments, (lon, v) => ribbonPoint(lon, v * 2 - 1, settings), false, 0);
-  surface(crossSegments, (lon, v) => ribbonPoint(lon, v * 2 - 1, settings, .03), true, 1);
-  surface(1, (lon, v) => ribbonPoint(lon, -1, settings, v * .03), true, 1);
-  surface(1, (lon, v) => ribbonPoint(lon, 1, settings, v * .03), false, 1);
+  surface(crossSegments, (lon, v) => ribbonPoint(lon, (v * 2 - 1) * (1 - bevel), settings), false, 0);
+  surface(crossSegments, (lon, v) => ribbonPoint(lon, (v * 2 - 1) * (1 - bevel), settings, thickness), true, 1);
+  // Semicircular rolled edges connect both faces and catch a continuous highlight.
+  for (const edge of [-1, 1]) {
+    surface(6, (lon, v) => {
+      const turn = v * Math.PI;
+      return ribbonPoint(lon, edge * (1 - bevel + bevel * Math.sin(turn)), settings, thickness * (1 - Math.cos(turn)) / 2);
+    }, edge === -1, 2);
+  }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   groups.forEach(group => geometry.addGroup(...group));
   geometry.computeVertexNormals();
+  // Weld the lighting at the longitude seam without merging UV coordinates.
+  const normals = geometry.getAttribute('normal');
+  for (let row = 0; row < positions.length / 3; row += segments + 1) {
+    const normal = new THREE.Vector3().fromBufferAttribute(normals, row)
+      .add(new THREE.Vector3().fromBufferAttribute(normals, row + segments)).normalize();
+    normals.setXYZ(row, normal.x, normal.y, normal.z);
+    normals.setXYZ(row + segments, normal.x, normal.y, normal.z);
+  }
   geometry.computeBoundingSphere();
   return geometry;
 }
@@ -209,7 +228,7 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
     const mount = mountRef.current;
     if (!mount) return undefined;
     let renderer;
-    try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' }); }
+    try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' }); }
     catch { setUnavailable(true); return undefined; }
     let disposed = false, lost = false, visible = false, frame = 0, previousTime = null, elapsed = 0, lastMetadata = -1, environment;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -229,18 +248,18 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
       scene.environment = next.texture; environment?.dispose(); environment = next;
       source.dispose(); pmrem.dispose();
     }
-    refreshEnvironment(); scene.environmentIntensity = 1.1;
-    scene.add(new THREE.HemisphereLight(0xcbd8e5, 0x202329, .55));
-    const key = new THREE.DirectionalLight(0xfff5e7, .025); key.position.set(-3.5, 5.5, 3.5); scene.add(key);
-    const fill = new THREE.DirectionalLight(0xc6d9f3, .025); fill.position.set(4, 1.5, -2); scene.add(fill);
+    refreshEnvironment(); scene.environmentIntensity = 1.15;
+    scene.add(new THREE.HemisphereLight(0xe8f0f6, 0x354b43, .65));
+    const key = new THREE.DirectionalLight(0xfff5e7, 1.8); key.position.set(-3.5, 5.5, 3.5); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xc6d9f3, 1.2); fill.position.set(4, 1.5, -2); scene.add(fill);
     const root = new THREE.Group(); root.name = 'rootGroup'; scene.add(root);
     const coreGroup = new THREE.Group(), shellGroupA = new THREE.Group(), shellGroupB = new THREE.Group(), scanGroup = new THREE.Group(), threatEffectGroup = new THREE.Group();
     for (const [group, name] of [[coreGroup, 'coreGroup'], [shellGroupA, 'shellGroupA'], [shellGroupB, 'shellGroupB'], [scanGroup, 'scanGroup'], [threatEffectGroup, 'threatGroup']]) { group.name = name; root.add(group); }
     const primaryCarrier = new THREE.Group(), secondaryCarrier = new THREE.Group();
     shellGroupA.add(primaryCarrier); shellGroupB.add(secondaryCarrier);
-    shellGroupA.rotation.set(.3, -.18, .65); shellGroupB.rotation.set(.4, .18, -.57); scanGroup.rotation.copy(shellGroupA.rotation);
+    shellGroupA.rotation.set(.06, 0, .65); shellGroupB.rotation.set(.52, 0, -.3); scanGroup.rotation.copy(shellGroupA.rotation);
     const coreMaterial = new THREE.MeshStandardMaterial({ color: 0x030908, metalness: 0, roughness: .9, emissive: 0x35ff8a, emissiveIntensity: .002, envMapIntensity: 0, side: THREE.BackSide });
-    const core = new THREE.Mesh(new THREE.SphereGeometry(1.46, mobile ? 48 : 72, mobile ? 32 : 48), coreMaterial);
+    const core = new THREE.Mesh(new THREE.SphereGeometry(1.34, mobile ? 48 : 72, mobile ? 32 : 48), coreMaterial);
     core.name = 'darkInnerChamber'; coreGroup.add(core);
     const nucleusMaterial = new THREE.ShaderMaterial({
       uniforms: { color: { value: new THREE.Color(0x35ff8a) }, power: { value: 1 }, cycle: { value: 0 } },
@@ -278,7 +297,7 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
           cells += dotShape * step(0.62, seed) * (0.4 + activity * 2.0);
           float rim = pow(1.0 - max(dot(normalize(vNormal), normalize(vView)), 0.0), 2.0);
           float flow = pow(max(0.0, sin(latitude * 19.0 - longitude * 4.0 + cycle * 2.0)), 24.0);
-          vec3 light = color * (0.018 + cells + rim * 0.4 + flow * 0.2) * power;
+          vec3 light = color * (0.035 + cells * 1.6 + rim * 0.65 + flow * 0.4) * power;
           gl_FragColor = vec4(light, 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -309,45 +328,70 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
         void main() {
           float facing = max(dot(normalize(vNormal), normalize(vView)), 0.0);
           float rim = pow(1.0 - facing, 2.2);
-          gl_FragColor = vec4(color * (0.25 + rim * 1.8) * power, 0.015 + rim * 0.28);
+          gl_FragColor = vec4(color * (0.4 + rim * 2.2) * power, 0.045 + rim * 0.35);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }
       `,
       transparent: true, depthWrite: false, depthTest: true,
     });
-    const coreHalo = new THREE.Mesh(new THREE.SphereGeometry(.435, mobile ? 36 : 56, mobile ? 24 : 36), coreGlowMaterial);
+    const coreHalo = new THREE.Mesh(new THREE.SphereGeometry(.445, mobile ? 36 : 56, mobile ? 24 : 36), coreGlowMaterial);
     coreHalo.name = 'internalCoreGlow'; coreGroup.add(coreHalo);
-    const coreTraceMaterial = new THREE.MeshBasicMaterial({ color: 0x44c982, transparent: true, opacity: .22 });
+    const coreTraceMaterial = new THREE.MeshBasicMaterial({ color: 0x44c982, transparent: true, opacity: .45, side: THREE.DoubleSide });
     const coreTraces = new THREE.Group(); coreTraces.rotation.set(.42, .1, -.3); coreGroup.add(coreTraces);
-    [-.48, .35].forEach(latitude => coreTraces.add(new THREE.Mesh(createInlay({ latitude, radius: 1.085, rake: 0 }, segments, 0, TAU, .003), coreTraceMaterial)));
+    [-.58, -.24, .24, .58].forEach((latitude, index) => coreTraces.add(new THREE.Mesh(createInlay({ latitude, radius: .73 + index * .04, rake: .12, phase: index }, segments, 0, TAU, .004), coreTraceMaterial)));
     const coreLight = new THREE.PointLight(0x44c982, .6, 2.5, 2); coreLight.position.set(-.1, .1, .55); coreGroup.add(coreLight);
-    const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0x21272d, metalness: 1, roughness: .25 });
-    const lipMaterial = new THREE.MeshStandardMaterial({ color: 0x8b9195, metalness: 1, roughness: .24, envMapIntensity: .9, side: THREE.DoubleSide });
-    const primary = [0x343d41, 0x505960, 0x252e34, 0x484f53, 0x30383d, 0x51585d, 0x62696d];
-    primary.forEach((color, index) => {
-      const latitude = [-1.38, -.94, -.51, .51, .94, 1.38, .12][index];
-      const halfWidth = index === 0 || index === 5 ? .205 : index === 6 ? .055 : .185;
-      const settings = { latitude, halfWidth, radius: 1.52 + (index % 2) * .008, rake: index === 6 ? .18 : .08, phase: index === 6 ? 1.5 : .2, lap: .021 };
-      const material = new THREE.MeshPhysicalMaterial({ color, metalness: .98, roughness: .17, clearcoat: .25, clearcoatRoughness: .18, envMapIntensity: 1.45, side: THREE.DoubleSide });
-      const band = new THREE.Mesh(createRibbon(settings, segments), [material, edgeMaterial]); band.name = `primaryRibbon${index + 1}`; primaryCarrier.add(band);
-      primaryCarrier.add(new THREE.Mesh(createInlay(settings, segments, 0, TAU, .0018, .98), lipMaterial));
+    // Fine directional machining marks stay subtle at hero size.
+    const brushData = new Uint8Array(256 * 128 * 4);
+    for (let y = 0; y < 128; y += 1) {
+      for (let x = 0; x < 256; x += 1) {
+        const value = Math.round(160 + 24 * Math.sin(y * 2.41) + 10 * Math.sin(y * 5.73 + Math.sin(x * TAU / 256) * .6));
+        const offset = (y * 256 + x) * 4;
+        brushData.set([value, value, value, 255], offset);
+      }
+    }
+    const brushedTexture = new THREE.DataTexture(brushData, 256, 128, THREE.RGBAFormat);
+    brushedTexture.wrapS = brushedTexture.wrapT = THREE.RepeatWrapping;
+    brushedTexture.magFilter = brushedTexture.minFilter = THREE.LinearFilter;
+    brushedTexture.repeat.set(3, 2); brushedTexture.needsUpdate = true;
+    const edgeMaterial = new THREE.MeshStandardMaterial({ color: 0x59656b, metalness: 1, roughness: .18, envMapIntensity: 1.8 });
+    const lipMaterial = new THREE.MeshStandardMaterial({ color: 0xc4cecb, metalness: 1, roughness: .18, envMapIntensity: 1.65, side: THREE.DoubleSide });
+    const innerMetal = new THREE.MeshStandardMaterial({ color: 0x21463a, metalness: .88, roughness: .23, envMapIntensity: 1.1, side: THREE.DoubleSide });
+    [-.85, -.5, .5, .85].forEach((latitude, index) => {
+      const settings = { latitude, halfWidth: .025, radius: .9 + index * .035, rake: .15, phase: index };
+      const mesh = new THREE.Mesh(createRibbon(settings, mobile ? 72 : 112, 6), [innerMetal, edgeMaterial, lipMaterial]);
+      coreTraces.add(mesh);
     });
-    [-.91, .72, 1.19].forEach((latitude, index) => {
-      const settings = { latitude, halfWidth: [.036, .046, .038][index], radius: 1.541 + index * .004, rake: .19, phase: 1.5, lap: .005 };
-      const material = new THREE.MeshPhysicalMaterial({ color: [0xa9b0b6, 0x858e97, 0x969fa7][index], metalness: .98, roughness: .14, clearcoat: .3, clearcoatRoughness: .2, envMapIntensity: 1.2, side: THREE.DoubleSide });
-      const band = new THREE.Mesh(createRibbon(settings, segments, 6), [material, edgeMaterial]); band.name = `secondaryRibbon${index + 1}`; secondaryCarrier.add(band);
-      secondaryCarrier.add(new THREE.Mesh(createInlay(settings, segments, 0, TAU, .0013, .96), lipMaterial));
+    const ribbonLayers = [];
+    const ribbonAccentMaterial = new THREE.MeshStandardMaterial({ color: 0x7be7ae, emissive: 0x35ff8a, emissiveIntensity: 1.6, metalness: .5, roughness: .22, side: THREE.DoubleSide });
+    function addRibbon(carrier, settings, color, index, family) {
+      const layer = new THREE.Group(); carrier.add(layer);
+      const material = new THREE.MeshPhysicalMaterial({ color, metalness: .96, roughness: .2, clearcoat: .35, clearcoatRoughness: .16, envMapIntensity: 1.3, bumpMap: brushedTexture, bumpScale: .002, side: THREE.DoubleSide });
+      const band = new THREE.Mesh(createRibbon(settings, segments), [material, edgeMaterial, lipMaterial]);
+      band.name = family + 'Ribbon' + (index + 1); layer.add(band);
+      layer.add(new THREE.Mesh(createInlay(settings, segments, 0, TAU, .0017, .92), lipMaterial));
+      if (index % 2 === 0) layer.add(new THREE.Mesh(createInlay(settings, segments, 0, TAU, .0028, -.9), ribbonAccentMaterial));
+      ribbonLayers.push({ layer, offset: index * .61, speed: index % 2 === 0 ? 1 : -1, family });
+    }
+    // Two diagonal families overlap around an open center. There is no band
+    // across the equator, so the luminous nucleus remains visible as they spin.
+    [-1.21, -.82, -.43, .43, .82, 1.21].forEach((latitude, index) => {
+      addRibbon(primaryCarrier, { latitude, halfWidth: [.22, .21, .21, .21, .21, .22][index], radius: 1.49 + index * .016, rake: .26, phase: index * .72, lap: .009 },
+        [0x657176, 0x8b9390, 0x52616b, 0x78868a, 0x4e5d65, 0x88918f][index], index, 'primary');
+    });
+    [-1.18, -.82, .82, 1.18].forEach((latitude, index) => {
+      addRibbon(secondaryCarrier, { latitude, halfWidth: [.11, .14, .14, .11][index], radius: 1.608 + index * .009, rake: .3, phase: .9 + index * .86, lap: .006 },
+        [0x9da7a2, 0x66777c, 0x95a2a3, 0x576b74][index], index, 'secondary');
     });
     const scanCarrier = new THREE.Group(); scanGroup.add(scanCarrier);
-    const scanSettings = { latitude: .0, halfWidth: .0035, radius: 1.545, rake: .08, phase: .2 };
+    const scanSettings = { latitude: .36, halfWidth: .0035, radius: 1.602, rake: .16, phase: .2 };
     const scanMaterial = new THREE.MeshStandardMaterial({ color: 0x68bd99, emissive: 0x469b78, emissiveIntensity: 1, metalness: .25, roughness: .28, side: THREE.DoubleSide });
     const scan = new THREE.Mesh(createInlay(scanSettings, segments), scanMaterial); scan.name = 'integratedSecurityPath'; scanCarrier.add(scan);
     const glowMaterial = new THREE.MeshBasicMaterial({ color: 0x64bc96, transparent: true, opacity: .11, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
-    scanCarrier.add(new THREE.Mesh(createInlay({ ...scanSettings, radius: 1.545 }, segments, 0, TAU, .014), glowMaterial));
+    scanCarrier.add(new THREE.Mesh(createInlay({ ...scanSettings, radius: 1.602 }, segments, 0, TAU, .014), glowMaterial));
     const pulseMaterial = new THREE.MeshBasicMaterial({ color: 0xb1e4c9, transparent: true, opacity: .0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
     const pulseCarrier = new THREE.Group();
-    const pulseSettings = { ...scanSettings, radius: 1.552, halfWidth: .009 };
+    const pulseSettings = { ...scanSettings, radius: 1.607, halfWidth: .009 };
     const pulseGeometry = createInlay(pulseSettings, 34, 0, .52, .009);
     pulseGeometry.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
     pulseCarrier.add(new THREE.Mesh(pulseGeometry, pulseMaterial)); scanGroup.add(pulseCarrier);
@@ -356,11 +400,13 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 3.2), shadowMaterial); shadow.rotation.x = -Math.PI / 2; shadow.position.set(.02, -1.9, -.1); scene.add(shadow);
     const glowTexture = softTexture('255, 255, 255', .75);
     const nucleusGlowMaterial = new THREE.SpriteMaterial({ map: glowTexture, color: 0x35ff8a, transparent: true, opacity: .65, depthWrite: false, blending: THREE.AdditiveBlending });
-    const nucleusGlow = new THREE.Sprite(nucleusGlowMaterial); nucleusGlow.scale.set(.92, .92, 1); nucleusGlow.position.set(0, 0, .49); coreGroup.add(nucleusGlow);
+    // Keep the optical flare facing the viewer while the physical core rotates.
+    const coreOptics = new THREE.Group(); root.add(coreOptics); coreOptics.quaternion.copy(camera.quaternion);
+    const nucleusGlow = new THREE.Sprite(nucleusGlowMaterial); nucleusGlow.scale.set(1.05, 1.05, 1); nucleusGlow.position.set(0, 0, .47); coreOptics.add(nucleusGlow);
     const nucleusSparkMaterial = new THREE.SpriteMaterial({ map: glowTexture, color: 0xbdffe0, transparent: true, opacity: .9, depthWrite: false, blending: THREE.AdditiveBlending });
-    const nucleusSpark = new THREE.Sprite(nucleusSparkMaterial); nucleusSpark.scale.set(.23, .23, 1); nucleusSpark.position.set(0, 0, .51); coreGroup.add(nucleusSpark);
-    const nucleusFlare = new THREE.Sprite(nucleusSparkMaterial); nucleusFlare.scale.set(.5, .013, 1); nucleusFlare.position.copy(nucleusSpark.position); coreGroup.add(nucleusFlare);
-    const nucleusFlareVertical = new THREE.Sprite(nucleusSparkMaterial); nucleusFlareVertical.scale.set(.011, .3, 1); nucleusFlareVertical.position.copy(nucleusSpark.position); coreGroup.add(nucleusFlareVertical);
+    const nucleusSpark = new THREE.Sprite(nucleusSparkMaterial); nucleusSpark.scale.set(.28, .28, 1); nucleusSpark.position.set(0, 0, .49); coreOptics.add(nucleusSpark);
+    const nucleusFlare = new THREE.Sprite(nucleusSparkMaterial); nucleusFlare.scale.set(.5, .013, 1); nucleusFlare.position.copy(nucleusSpark.position); coreOptics.add(nucleusFlare);
+    const nucleusFlareVertical = new THREE.Sprite(nucleusSparkMaterial); nucleusFlareVertical.scale.set(.011, .3, 1); nucleusFlareVertical.position.copy(nucleusSpark.position); coreOptics.add(nucleusFlareVertical);
     const scanGlintMaterial = new THREE.SpriteMaterial({ map: glowTexture, color: 0x70e5b2, transparent: true, opacity: .55, depthWrite: false, blending: THREE.AdditiveBlending });
     const scanGlint = new THREE.Sprite(scanGlintMaterial); scanGlint.scale.set(.22, .22, 1); scanCarrier.add(scanGlint);
     const threatMaterial = new THREE.MeshBasicMaterial({ color: 0xbf4d40, transparent: true, opacity: 0 });
@@ -368,7 +414,7 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
     const threatGlowMaterial = new THREE.SpriteMaterial({ map: glowTexture, color: 0xb44537, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
     const threatGlow = new THREE.Sprite(threatGlowMaterial); threatGlow.scale.set(.22, .22, 1); threat.add(threatGlow); threatEffectGroup.add(threat);
     const contactDirection = new THREE.Vector3(.74, .45, 1.18).normalize();
-    const perimeter = contactDirection.clone().multiplyScalar(1.604), approachStart = new THREE.Vector3(2.0, .92, .82);
+    const perimeter = contactDirection.clone().multiplyScalar(1.69), approachStart = new THREE.Vector3(2.0, .92, .82);
     const contactPulseMaterial = new THREE.MeshBasicMaterial({ color: 0xb84d42, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
     const contactPulse = new THREE.Mesh(new THREE.RingGeometry(.047, .055, 36), contactPulseMaterial);
     contactPulse.position.copy(perimeter); contactPulse.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), contactDirection); threatEffectGroup.add(contactPulse);
@@ -380,32 +426,38 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
     function renderAt(time, delta = 0) {
       if (disposed || lost) return;
       const state = sampleSecuritySequence(reducedMotion.matches ? 0 : time), cycle = state.time / 30 * TAU;
-      primaryCarrier.rotation.y = state.angleA; secondaryCarrier.rotation.y = state.angleB;
-      shellGroupA.rotation.x = .3 + .06 * Math.sin(cycle); shellGroupA.rotation.z = .65 + .055 * Math.sin(cycle * 2);
-      shellGroupB.rotation.x = .4 + .065 * Math.sin(cycle); shellGroupB.rotation.z = -.57 + .065 * Math.sin(cycle * 2);
-      scanGroup.rotation.copy(shellGroupA.rotation); scanCarrier.rotation.y = state.angleA; pulseCarrier.rotation.y = state.angleA;
+      const spinA = state.angleA * SHELL_SPEED, spinB = state.angleB * SHELL_SPEED;
+      primaryCarrier.rotation.y = spinA; secondaryCarrier.rotation.y = spinB;
+      for (const { layer, offset, speed, family } of ribbonLayers) {
+        layer.rotation.y = offset + (family === 'primary' ? state.angleA : state.angleB) * speed;
+      }
+      shellGroupA.rotation.x = .06 + .06 * Math.sin(cycle * 3); shellGroupA.rotation.z = .65 + .13 * Math.sin(cycle * 2);
+      shellGroupB.rotation.x = .52 + .06 * Math.sin(cycle * 2); shellGroupB.rotation.z = -.3 + .12 * Math.sin(cycle * 3);
+      scanGroup.rotation.copy(shellGroupA.rotation); scanCarrier.rotation.y = spinA; pulseCarrier.rotation.y = spinA;
       // Move a short luminous segment along the exact raked inlay. Rotating a
       // separate ring here would drift off the shell's security path.
       const pulsePositions = pulseGeometry.getAttribute('position');
       for (let i = 0; i <= 34; i += 1) {
         for (let side = 0; side < 2; side += 1) {
-          const point = ribbonPoint(cycle * 2 + i / 34 * .52, side * 2 - 1, pulseSettings);
+          const point = ribbonPoint(cycle * 12 + i / 34 * .52, side * 2 - 1, pulseSettings);
           pulsePositions.setXYZ(i * 2 + side, point.x, point.y, point.z);
         }
       }
       pulsePositions.needsUpdate = true;
-      scanGlint.position.copy(ribbonPoint(-.48 + cycle * 2, 0, { ...scanSettings, radius: 1.57 }));
-      coreGroup.rotation.y = .012 * Math.sin(cycle);
+      scanGlint.position.copy(ribbonPoint(-.48 + cycle * 12, 0, { ...scanSettings, radius: 1.615 }));
+      coreGroup.rotation.set(cycle * 8, -cycle * 15, cycle * 3);
+      coreTraces.rotation.y = cycle * 10;
       pointer.lerp(pointerTarget, 1 - Math.exp(-delta * 4)); root.rotation.set(pointer.y * .02, pointer.x * .03, 0);
       root.position.y = reducedMotion.matches ? 0 : .025 * Math.sin(cycle * 5); shadowMaterial.opacity = .64 - root.position.y * .5;
       accent.setRGB(...state.color); scanMaterial.color.copy(accent); scanMaterial.emissive.copy(accent);
-      const corePower = .94 + .1 * Math.sin(cycle * 2) + .2 * state.defense + .12 * state.resolve;
+      ribbonAccentMaterial.emissive.copy(accent); ribbonAccentMaterial.color.copy(accent);
+      const corePower = 1.55 + .12 * Math.sin(cycle * 2) + .2 * state.defense + .12 * state.resolve;
       coreMaterial.emissive.copy(accent); coreMaterial.emissiveIntensity = .002 * corePower;
       coreGlowMaterial.uniforms.color.value.copy(accent); coreGlowMaterial.uniforms.power.value = corePower;
       nucleusMaterial.uniforms.color.value.copy(accent); nucleusMaterial.uniforms.power.value = corePower; nucleusMaterial.uniforms.cycle.value = cycle;
       nucleusGlowMaterial.color.copy(accent); nucleusGlowMaterial.opacity = .3 * corePower;
       nucleusSparkMaterial.color.copy(accent).lerp(resolvingColor, .88);
-      coreTraceMaterial.color.copy(accent); coreLight.color.copy(accent); coreLight.intensity = .62 * corePower;
+      coreTraceMaterial.color.copy(accent); coreLight.color.copy(accent); coreLight.intensity = 2.4 * corePower;
       scanGlintMaterial.color.copy(accent); scanGlintMaterial.opacity = .5 + .1 * state.resolve;
       scanMaterial.emissiveIntensity = 1 + state.defense * .12; glowMaterial.color.copy(accent); glowMaterial.opacity = .085 + state.defense * .03;
       pulseMaterial.color.copy(accent).lerp(resolvingColor, .18); pulseMaterial.opacity = .13 * state.defense + .34 * state.resolve;
@@ -419,13 +471,15 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
       localLight.color.copy(accent); localLight.intensity = .055 + state.defense * .16 + state.resolve * .13;
       renderer.render(scene, camera);
       if (Math.abs(time - lastMetadata) > .1 || lastMetadata === -1) {
-        mount.dataset.securityPhase = state.phase; mount.dataset.securityTime = state.time.toFixed(3); mount.dataset.shellSpeed = state.speedA.toFixed(3);
+        mount.dataset.securityPhase = state.phase; mount.dataset.securityTime = state.time.toFixed(3); mount.dataset.shellSpeed = (state.speedA * SHELL_SPEED).toFixed(3);
         mount.dataset.coreColor = accent.getHexString(); mount.dataset.coreGlow = corePower.toFixed(3); lastMetadata = time;
       }
     }
     function tick(now) {
       frame = 0;
-      if (disposed || lost || !visible || document.hidden || reducedMotion.matches) return;
+      if (disposed || lost || !visible || document.hidden) return;
+      // Some browsers update the media query before delivering its change event.
+      if (reducedMotion.matches) { motionChange(); return; }
       const delta = previousTime === null ? 0 : Math.max(0, (now - previousTime) / 1000); previousTime = now; elapsed += delta;
       renderAt(elapsed, Math.min(delta, .1)); frame = requestAnimationFrame(tick);
     }
@@ -466,10 +520,10 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
         if (object.material) (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => materials.add(material));
       });
       geometries.forEach(geometry => geometry.dispose()); materials.forEach(material => material.dispose());
-      shadowTexture.dispose(); glowTexture.dispose(); environment.dispose(); renderer.dispose(); renderer.forceContextLoss(); renderer.domElement.remove();
+      shadowTexture.dispose(); glowTexture.dispose(); brushedTexture.dispose(); environment.dispose(); renderer.dispose(); renderer.forceContextLoss(); renderer.domElement.remove();
     };
   }, []);
-  return <><style>{SPHERE_STYLES}</style><div ref={mountRef} className={`hero-sphere penetix-security-core${unavailable ? ' penetix-security-core--unavailable' : ''} ${className}`} style={style} data-layout={fit} role="img" aria-label="PENETIX security illustration: graphite protective ribbons rotate around a stable illuminated inner core, visible through the shell. Its light changes from secure green through amber and alert red and back to green as a simulated threat is contained and neutralized in a repeating 30-second sequence." data-shell-count="10">
+  return <><style>{SPHERE_STYLES}</style><div ref={mountRef} className={`hero-sphere penetix-security-core${unavailable ? ' penetix-security-core--unavailable' : ''} ${className}`} style={style} data-layout={fit} role="img" aria-label="PENETIX security illustration: overlapping curved metallic ribbons spin rapidly around a rotating, brightly illuminated inner core, visible through the shell. Its light changes from secure green through amber and alert red and back to green as a simulated threat is contained and neutralized in a repeating 30-second sequence." data-shell-count="10">
     {unavailable && <span className="penetix-security-core__fallback">PENETIX<br />SECURITY SYSTEM 001</span>}
   </div></>;
 }
