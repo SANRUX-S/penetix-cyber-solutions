@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10201d" />
+    <meta name="description" content="Practical cybersecurity assessments, hardening and risk reduction for growing businesses. Understand your exposure. Fix what matters. Build stronger security with PENETIX." />
+    <meta property="og:title" content="PENETIX — Security without the noise." />
+    <meta property="og:description" content="Clarity. Protection. Confidence. Practical cybersecurity for modern businesses." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/images/architecture.webp" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="image" href="/images/hero-architecture.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+    <title>PENETIX — Security without the noise.</title>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('error', function(e) {
+        console.error('Global error caught:', e);
+        var el = document.getElementById('fatal-err-box');
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'fatal-err-box';
+          el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#0d0d11;color:#fff;padding:40px;z-index:999999;font-family:monospace;font-size:14px;overflow:auto;line-height:1.6;';
+          document.body.appendChild(el);
+        }
+        el.innerHTML = '<h2 style="color:#ef4444;margin-top:0;">⚠️ JavaScript Error Detected</h2>' +
+          '<p style="color:#fbbf24;font-size:16px;"><strong>' + (e.message || 'Unknown error') + '</strong></p>' +
+          '<p style="color:#a1a1aa;">File: ' + (e.filename || '') + ' : line ' + (e.lineno || '') + '</p>' +
+          '<pre style="background:#18181b;padding:16px;border-radius:8px;color:#f4f4f5;overflow:auto;">' + (e.error ? e.error.stack : 'No stack trace') + '</pre>' +
+          '<button onclick="window.location.reload()" style="margin-top:20px;padding:10px 24px;background:#fff;color:#000;border:none;border-radius:9999px;font-weight:600;cursor:pointer;">Reload</button>';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled rejection:', e);
+      });
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
