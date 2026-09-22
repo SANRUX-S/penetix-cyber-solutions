@@ -26,16 +26,16 @@ const stats = [
 const pillars = [
   {
     icon: ShieldCheck,
-    title: "Zero-Trust Web Architecture",
+    title: "Security-First Web Architecture",
     description:
-      "Engineered from the ground up to eliminate attack vectors. Automated Content Security Policies (CSP), subresource integrity, strict sanitization, and OWASP Top 10 mitigation.",
+      "Designed with defense-in-depth practices including sensible Content Security Policies (CSP), input handling, dependency review and OWASP-aligned mitigation techniques where applicable.",
     badge: "Security Core",
   },
   {
     icon: Zap,
-    title: "Sub-Second Edge Performance",
+    title: "Performance-Focused Delivery",
     description:
-      "Modern React, Vite, and Next.js engineering with global edge delivery, tree-shaken bundles, image optimization pipelines, and green Core Web Vitals across all viewports.",
+      "Modern React, Vite and Next.js engineering with optimized bundles, responsive assets, caching strategies and performance tuning aimed at strong Core Web Vitals.",
     badge: "Speed & Scale",
   },
   {
@@ -47,9 +47,9 @@ const pillars = [
   },
   {
     icon: Server,
-    title: "Hardened CI/CD & Deployment",
+    title: "Secure Deployment Practices",
     description:
-      "Automated continuous integration pipelines, cryptographic build verification, zero-downtime rolling releases, and turnkey compatibility with hardened cloud hosting.",
+      "Structured deployment workflows with environment separation, dependency checks, secure configuration practices and cloud-ready delivery based on project requirements.",
     badge: "DevOps",
   },
 ];
@@ -72,8 +72,8 @@ const steps = [
   },
   {
     num: "04",
-    title: "Edge Deployment & Continuous Audit",
-    desc: "Automated deployment to high-availability global edge networks with continuous vulnerability scanning and telemetry.",
+    title: "Deployment & Verification",
+    desc: "Deployment is configured for the selected hosting environment, followed by launch checks, dependency review and agreed post-launch monitoring where included in scope.",
   },
 ];
 
@@ -81,7 +81,7 @@ export default function WebDevPage({ onContact, onLegal, onNavigateHome }) {
   return (
     <div className="min-h-screen bg-[#000000] text-foreground font-inter antialiased">
       {/* Top Secondary Sticky Navigation */}
-      <div className="sticky top-[72px] z-40 border-b border-white/10 bg-black/80 backdrop-blur-md">
+      <div className="sticky top-[64px] sm:top-[72px] z-40 border-b border-white/10 bg-black/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <button
@@ -148,7 +148,7 @@ export default function WebDevPage({ onContact, onLegal, onNavigateHome }) {
 
             <FadeUp delay={0.2}>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-foreground/60 sm:text-lg">
-                We engineer modern, responsive web applications and landing pages that marry stunning high-fidelity aesthetics with zero-trust cyber resilience and lightning-fast edge performance.
+                We engineer modern, responsive web applications and landing pages that combine high-fidelity design with security-focused development and performance-conscious delivery.
               </p>
             </FadeUp>
 
@@ -195,16 +195,16 @@ export default function WebDevPage({ onContact, onLegal, onNavigateHome }) {
                   <span>Edge Optimized</span>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-foreground/60">
-                  Sub-second load times engineered for modern SEO algorithms and high customer conversion.
+                  Performance tuning, responsive assets and delivery practices designed to improve user experience and support modern SEO.
                 </p>
               </div>
               <div className="p-5 rounded-2xl border border-white/5 bg-white/[0.02]">
                 <div className="flex items-center justify-center md:justify-start gap-2 text-white font-medium text-sm">
                   <Lock size={18} className="text-violet-400" />
-                  <span>Zero-Trust Security</span>
+                  <span>Security-First Engineering</span>
                 </div>
                 <p className="mt-2 text-xs leading-relaxed text-foreground/60">
-                  Built-in OWASP compliance, secure HTTP headers, and verified defensive architecture.
+                  OWASP-aligned defensive practices, secure HTTP headers where applicable, safer input handling and deployment hardening.
                 </p>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function WebDevPage({ onContact, onLegal, onNavigateHome }) {
         </section>
 
         {/* 2. ARCHITECTURE PILLARS GRID */}
-        <section id="architecture" className="border-t border-white/10 bg-white/[0.015] px-4 py-20 sm:px-6">
+        <section id="architecture" className="scroll-mt-36 border-t border-white/10 bg-white/[0.015] px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-7xl">
             <div className="mb-14 max-w-2xl">
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
@@ -222,7 +222,7 @@ export default function WebDevPage({ onContact, onLegal, onNavigateHome }) {
                 Built to withstand modern threats and delight your users.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-foreground/60 sm:text-base">
-                Security is not an afterthought or an added plugin. Every component, API interaction, and asset delivery route is engineered under zero-trust defense principles.
+                Security is treated as part of the engineering process. Components, API interactions and deployment choices are reviewed using defense-in-depth principles appropriate to the project.
               </p>
             </div>
 
@@ -251,7 +251,7 @@ export default function WebDevPage({ onContact, onLegal, onNavigateHome }) {
                       </p>
                     </div>
                     <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-1.5 text-xs text-foreground/40 group-hover:text-foreground/80 transition-colors">
-                      <span>Production verified</span>
+                      <span>Engineering standard</span>
                       <CheckCircle2 size={13} className="text-emerald-400" />
                     </div>
                   </div>
