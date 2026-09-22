@@ -152,9 +152,9 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
     e.preventDefault();
     setOpen(false);
     setServicesOpen(false);
-    if (currentRoute === 'hosting') {
+    if (currentRoute !== 'home') {
       if (onNavigate) onNavigate('home', 'home');
-      else window.location.hash = '#home';
+      else window.location.href = '/#home';
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       window.history.replaceState(null, '', '#home');
@@ -166,9 +166,9 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
     e.preventDefault();
     setOpen(false);
     setServicesOpen(false);
-    if (currentRoute === 'hosting') {
+    if (currentRoute !== 'home') {
       if (onNavigate) onNavigate('home', 'services');
-      else window.location.hash = '#services';
+      else window.location.href = '/#services';
     } else {
       const el = document.getElementById('services');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -180,7 +180,7 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
   const handleServiceSelect = (serviceTitle) => {
     setOpen(false);
     setServicesOpen(false);
-    if (currentRoute === 'hosting') {
+    if (currentRoute !== 'home') {
       if (onNavigate) onNavigate('home', 'services');
     } else {
       const el = document.getElementById('services');
@@ -198,7 +198,7 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
     } else if (onWebDev) {
       onWebDev();
     } else {
-      window.location.hash = '#/web-development';
+      window.location.href = '/web-development';
     }
   };
 
@@ -207,7 +207,7 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
     setOpen(false);
     setServicesOpen(false);
     if (onNavigate) onNavigate('hosting');
-    else window.location.hash = '#/hosting';
+    else window.location.href = '/hosting';
   };
 
   const handleSectionClick = (e, sectionId) => {
@@ -215,7 +215,7 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
     setOpen(false);
     setServicesOpen(false);
     if (sectionId === 'contact') {
-      if (currentRoute === 'hosting') {
+      if (currentRoute !== 'home') {
         if (onNavigate) onNavigate('home', 'contact');
       } else {
         const el = document.getElementById('contact');
@@ -225,9 +225,9 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
       return;
     }
 
-    if (currentRoute === 'hosting') {
+    if (currentRoute !== 'home') {
       if (onNavigate) onNavigate('home', sectionId);
-      else window.location.hash = `#${sectionId}`;
+      else window.location.href = `/#${sectionId}`;
     } else {
       const el = document.getElementById(sectionId);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
