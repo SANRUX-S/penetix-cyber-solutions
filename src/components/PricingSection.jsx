@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, ShieldCheck, Sparkles, Layers, Cpu, Code2, Server, Globe, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -342,6 +342,10 @@ const techStackList = [
 
 // 7. PricingCard Component (Order strictly matching Section 14)
 export function PricingCard({ plan, onContact }) {
+  const [expanded, setExpanded] = useState(false);
+  const visibleFeatures = expanded ? plan.features : plan.features.slice(0, 10);
+  const hiddenFeatureCount = Math.max(plan.features.length - 10, 0);
+
   const handleAction = (e) => {
     if (onContact) {
       e.preventDefault();
@@ -450,7 +454,7 @@ export function PricingCard({ plan, onContact }) {
         {/* 8. Feature list */}
         <FadeUp delay={0.25} className="flex flex-1 flex-col">
           <ul className="mt-5 flex flex-1 flex-col gap-2.5">
-            {plan.features.map((item, idx) => {
+            {visibleFeatures.map((item, idx) => {
               if (item.isSubheading) {
                 return (
                   <li
@@ -476,6 +480,16 @@ export function PricingCard({ plan, onContact }) {
               );
             })}
           </ul>
+          {hiddenFeatureCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setExpanded((current) => !current)}
+              className="mt-4 w-full rounded-lg border border-white/10 bg-white/[0.025] px-3 py-2 text-[11px] font-medium text-foreground/65 transition-colors hover:border-white/20 hover:text-white"
+              aria-expanded={expanded}
+            >
+              {expanded ? "Show fewer features" : `View all features (+${hiddenFeatureCount})`}
+            </button>
+          )}
         </FadeUp>
       </div>
     </SpotlightBorder>
@@ -501,7 +515,7 @@ export default function PricingSection({ onContact }) {
   return (
     <section
       id="pricing"
-      className="relative w-full bg-[#000000] py-14 sm:py-20 font-inter text-foreground"
+      className="relative w-full scroll-mt-36 bg-[#000000] py-14 sm:py-20 font-inter text-foreground"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* SECTION HEADER */}
@@ -521,7 +535,7 @@ export default function PricingSection({ onContact }) {
           </FadeUp>
           <FadeUp delay={0.15}>
             <p className="mt-4 text-sm sm:text-base text-foreground/60 leading-relaxed max-w-2xl">
-              Engineered with modern web architectures under strict zero-trust standards. Fixed-scope launch pricing in USD with no hidden surprises.
+              Engineered with modern web architectures and security-focused practices. Introductory launch pricing is shown in USD with scope defined before work begins.
             </p>
           </FadeUp>
         </div>
