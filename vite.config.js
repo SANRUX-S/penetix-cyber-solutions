@@ -15,6 +15,11 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        webDevelopment: path.resolve(__dirname, 'web-development.html'),
+        hosting: path.resolve(__dirname, 'hosting.html'),
+      },
       output: { manualChunks: { three: ['three'] } },
     },
   },
