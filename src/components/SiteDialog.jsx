@@ -4,7 +4,7 @@ import '../styles/dialog.css';
 
 const EMAIL = 'penetixcybersolutions@gmail.com';
 const SERVICES = [
-  'Web Development', 'Security Assessment', 'Vulnerability Assessment', 'Website Security Review',
+  'Web Development', 'Managed Hosting / Future Infrastructure', 'Security Assessment', 'Vulnerability Assessment', 'Website Security Review',
   'Infrastructure Hardening', 'Email Security', 'Account & Access Security',
   'Security Health Check', 'Backup & Recovery Review', 'Cloud / Hosting Security Review',
   'Device Security Review', 'Security Awareness', 'Security Improvement Roadmap',
@@ -50,9 +50,9 @@ function ContactContent({ service }) {
     event.preventDefault();
     const values = new FormData(event.currentTarget);
     const selectedService = values.get('service') || 'Help choosing a service';
-    const subject = `PENETIX security review request — ${selectedService}`;
+    const subject = `PENETIX enquiry — ${selectedService}`;
     const body = [
-      'Hello PENETIX,', '', 'I would like to discuss a security review.', '',
+      'Hello PENETIX,', '', 'I would like to discuss a project or service.', '',
       `Name: ${values.get('name')}`, `Business email: ${values.get('email')}`,
       `Company: ${values.get('company') || 'Not provided'}`, `Service: ${selectedService}`,
       '', 'About the request:', values.get('message'), '',
@@ -64,7 +64,7 @@ function ContactContent({ service }) {
 
   return (
     <div className="contact-content">
-      <p className="dialog-intro">Tell us a little about your business and what you would like to protect. We’ll start with a conversation and a clear scope.</p>
+      <p className="dialog-intro">Tell us a little about your business and what you would like to build, improve or protect. We’ll start with a conversation and a clear scope.</p>
       <form className="contact-form" onSubmit={prepareEmail}>
         <div className="contact-fields">
           <label htmlFor={`${id}-name`}>Your name <span aria-hidden="true">*</span>
@@ -85,7 +85,7 @@ function ContactContent({ service }) {
           </label>
         </div>
         <label htmlFor={`${id}-message`}>How can we help? <span aria-hidden="true">*</span>
-          <textarea id={`${id}-message`} name="message" rows={4} required maxLength={2500} placeholder="A short overview of your business, the systems in scope, and your main concern." aria-describedby={`${id}-note`} />
+          <textarea id={`${id}-message`} name="message" rows={4} required maxLength={2500} placeholder="A short overview of your business, what you need, and any important requirements." aria-describedby={`${id}-note`} />
         </label>
         <p id={`${id}-note`} className="contact-note"><ShieldCheck size={16} aria-hidden="true" />Please share an overview only. Don’t include passwords, access tokens or sensitive findings.</p>
         <div className="contact-submit">
