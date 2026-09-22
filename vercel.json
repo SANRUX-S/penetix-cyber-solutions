@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/web-development",
+      "destination": "/web-development.html"
+    },
+    {
+      "source": "/hosting",
+      "destination": "/hosting.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
