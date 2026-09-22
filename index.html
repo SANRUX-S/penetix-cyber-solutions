@@ -17,26 +17,6 @@
     <title>PENETIX — Security without the noise.</title>
   </head>
   <body>
-    <script>
-      window.addEventListener('error', function(e) {
-        console.error('Global error caught:', e);
-        var el = document.getElementById('fatal-err-box');
-        if (!el) {
-          el = document.createElement('div');
-          el.id = 'fatal-err-box';
-          el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#0d0d11;color:#fff;padding:40px;z-index:999999;font-family:monospace;font-size:14px;overflow:auto;line-height:1.6;';
-          document.body.appendChild(el);
-        }
-        el.innerHTML = '<h2 style="color:#ef4444;margin-top:0;">⚠️ JavaScript Error Detected</h2>' +
-          '<p style="color:#fbbf24;font-size:16px;"><strong>' + (e.message || 'Unknown error') + '</strong></p>' +
-          '<p style="color:#a1a1aa;">File: ' + (e.filename || '') + ' : line ' + (e.lineno || '') + '</p>' +
-          '<pre style="background:#18181b;padding:16px;border-radius:8px;color:#f4f4f5;overflow:auto;">' + (e.error ? e.error.stack : 'No stack trace') + '</pre>' +
-          '<button onclick="window.location.reload()" style="margin-top:20px;padding:10px 24px;background:#fff;color:#000;border:none;border-radius:9999px;font-weight:600;cursor:pointer;">Reload</button>';
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        console.error('Unhandled rejection:', e);
-      });
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
