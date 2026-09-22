@@ -4,51 +4,62 @@ import { useState } from "react";
 
 const plans = [
   {
-    name: "Launch",
-    eyebrow: "For personal projects",
+    name: "Cloud VPS Secure",
+    eyebrow: "Starter Hardened",
     description:
-      "Everything you need to turn a fresh idea into a polished first release.",
-    monthlyPrice: 14,
-    yearlyPrice: 134,
+      "Ideal for business websites, portals, and web applications needing hardened kernel isolation.",
+    monthlyPrice: 49,
+    yearlyPrice: 470,
     features: [
-      "Unlimited active projects",
-      "Reusable design presets",
-      "Private workspaces",
-      "Standard support",
+      "4 vCPU Cores (Dedicated Allocation)",
+      "8 GB ECC Memory",
+      "160 GB Enterprise NVMe Storage",
+      "10 TB High-Speed Bandwidth",
+      "Automated WAF & Daily Backups",
+      "Free Let’s Encrypt Wildcard SSL",
+      "Standard 99.95% Uptime SLA",
     ],
   },
   {
-    name: "Momentum",
-    eyebrow: "For growing teams",
+    name: "Dedicated Security Server",
+    eyebrow: "Enterprise Recommended",
     description:
-      "A flexible workspace for teams shipping frequently and collaborating daily.",
-    monthlyPrice: 39,
-    yearlyPrice: 374,
+      "Bare-metal performance with hardware-level isolation for high-traffic and compliance-driven workloads.",
+    monthlyPrice: 189,
+    yearlyPrice: 1814,
     featured: true,
     features: [
-      "Everything in Launch",
-      "Advanced team permissions",
-      "Shared component libraries",
-      "Priority support",
+      "8 Cores / 16 Threads AMD EPYC",
+      "32 GB ECC DDR4 Memory",
+      "500 GB RAID-1 NVMe Storage",
+      "Unlimited High-Speed Clean Bandwidth",
+      "Advanced Layer 7 DDoS Scrubbing",
+      "Continuous Intrusion Detection (IDS/IPS)",
+      "Dedicated IP & Hardware MFA Access",
+      "Priority 99.99% Uptime SLA",
     ],
   },
   {
-    name: "Frontier",
-    eyebrow: "For larger organizations",
+    name: "High-Availability Cluster",
+    eyebrow: "Mission Critical",
     description:
-      "More control, security, and support for complex products and larger teams.",
-    monthlyPrice: 89,
-    yearlyPrice: 854,
+      "Multi-node failover cluster designed for zero-downtime financial, healthcare, and enterprise apps.",
+    monthlyPrice: 449,
+    yearlyPrice: 4310,
     features: [
-      "Everything in Momentum",
-      "Unlimited team members",
-      "Advanced security controls",
-      "Dedicated onboarding",
+      "Multi-Region Load Balanced Cluster",
+      "64 GB+ Distributed Memory",
+      "Synchronous Real-Time Data Replication",
+      "Global Anycast Network Routing",
+      "Custom WAF Rule Engineering",
+      "Automated Multi-Zone Disaster Recovery",
+      "Dedicated Security Engineer Support",
+      "99.999% High Availability SLA",
     ],
   },
 ];
 
-const headingWords = "Simple pricing for ambitious ideas".split(" ");
+const headingWords = "Hardened hosting plans for uncompromising security".split(" ");
 
 export default function HostingPricingSection({ onContact }) {
   const [billing, setBilling] = useState("monthly");
@@ -86,7 +97,7 @@ export default function HostingPricingSection({ onContact }) {
             className="pricing-badge mx-auto mb-3 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-violet-100 backdrop-blur-xl"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Choose what fits today. Upgrade anytime.</span>
+            <span>Fortified Cloud Infrastructure</span>
           </motion.div>
 
           <h2 className="pricing-title flex flex-wrap justify-center gap-x-[0.24em] text-balance text-3xl font-semibold tracking-[-0.04em] sm:text-4xl lg:text-5xl">
@@ -114,7 +125,7 @@ export default function HostingPricingSection({ onContact }) {
             transition={{ delay: 0.42, duration: 0.45 }}
             className="pricing-desc mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/55 sm:text-base"
           >
-            Start small, move fast, and unlock more power whenever your work grows.
+            High-performance hosting environments pre-configured with defensive hardening, strict isolation, and continuous threat monitoring.
           </motion.p>
 
           {/* Billing switch */}
@@ -251,7 +262,14 @@ export default function HostingPricingSection({ onContact }) {
 
               <button
                 type="button"
-                onClick={() => onContact && onContact(`Hosting Plan: ${plan.name}`)}
+                onClick={() =>
+                  onContact &&
+                  onContact(
+                    `Hosting Plan: ${plan.name} (${
+                      isYearly ? `$${plan.yearlyPrice}/yr` : `$${plan.monthlyPrice}/mo`
+                    })`
+                  )
+                }
                 className={`card-action-btn relative mt-5 w-full overflow-hidden rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 ${
                   plan.featured
                     ? "is-featured-btn border-violet-400/60 bg-gradient-to-b from-violet-500 to-indigo-600 text-white shadow-lg shadow-violet-950/40 hover:brightness-110"

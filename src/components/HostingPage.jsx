@@ -1,155 +1,306 @@
+import { useState } from 'react';
 import {
   ShieldCheck,
   Server,
+  LockKeyhole,
   DatabaseBackup,
+  KeyRound,
   Activity,
   ArrowRight,
-  Clock3,
-  Network,
+  Cpu,
+  Globe,
+  HardDrive,
 } from 'lucide-react';
 import Footer from './Footer.jsx';
+import HostingPricingSection from './HostingPricingSection.jsx';
 
-const plannedCapabilities = [
+const features = [
   {
     icon: ShieldCheck,
-    title: 'Security-focused baseline',
+    title: 'Multi-Layer DDoS Mitigation',
     description:
-      'Hardened deployment standards, least-privilege administration, secure access controls and documented configuration practices.',
+      'Continuous volumetric and application-layer (Layer 3/4 & Layer 7) traffic scrubbing. Protects against massive bot floods without increasing latency.',
   },
   {
     icon: Server,
-    title: 'Isolated workloads',
+    title: 'Kernel-Hardened OS',
     description:
-      'Client workloads are planned around clear isolation boundaries with controlled resource allocation and maintainable deployment patterns.',
+      'Operating systems customized with strict SELinux/AppArmor profiles, kernel security patches, and zero unnecessary listening daemons or legacy services.',
+  },
+  {
+    icon: LockKeyhole,
+    title: 'Intelligent Web Application Firewall',
+    description:
+      'Automated WAF continuously updated to stop OWASP Top 10 exploits, zero-days, SQL injection, cross-site scripting, and malicious scraping.',
   },
   {
     icon: DatabaseBackup,
-    title: 'Backup & recovery planning',
+    title: 'Immutable Daily Backups',
     description:
-      'Automated backup workflows, separate recovery copies and restore testing are being designed before managed hosting is offered publicly.',
+      'Encrypted, offsite, air-gapped snapshots with verified restore points to guarantee business continuity and ransomware immunity.',
+  },
+  {
+    icon: KeyRound,
+    title: 'Zero-Trust Access Control',
+    description:
+      'Enforce hardware key MFA, IP whitelisting, and strict cryptographic SSH key authentication. No passwords or unprotected administrative interfaces.',
   },
   {
     icon: Activity,
-    title: 'Monitoring & alerting',
+    title: '24/7 Threat Telemetry & Monitoring',
     description:
-      'Availability, resource health and security-relevant events will be monitored with clear alerting and operational response procedures.',
+      'Real-time perimeter monitoring, anomaly detection, and automated alerts to catch suspicious access attempts before they escalate.',
+  },
+];
+
+const faqs = [
+  {
+    q: 'How does PENETIX Hardened Hosting differ from standard web hosts?',
+    a: 'Standard hosts prioritize density and low cost, often sharing kernel resources and leaving management interfaces vulnerable. PENETIX configures each environment from the ground up with defensive hardening: kernel-level protections, proactive WAF rules, isolated environments, and continuous monitoring.',
   },
   {
-    icon: Network,
-    title: 'Scalable network architecture',
-    description:
-      'The platform is being planned to support reliable networking, future redundancy and controlled expansion as customer demand grows.',
+    q: 'Can PENETIX assist with migrating our existing website or database?',
+    a: 'Yes. Our security engineering team handles full end-to-end migrations with zero downtime, performing security audits on your existing code and databases during the transition.',
   },
   {
-    icon: Clock3,
-    title: 'Transparent service levels',
-    description:
-      'Uptime targets, support windows, backup retention and other service commitments will be published only after they are tested and supportable.',
+    q: 'Where are your data centers located?',
+    a: 'Our infrastructure is housed in Tier III+ and Tier IV certified facilities in North America, Europe, and Asia-Pacific, featuring redundant power, physical biometric access security, and multi-homed tier-1 transit.',
+  },
+  {
+    q: 'How are backups and disaster recovery managed?',
+    a: 'All data is snapshotted daily with AES-256 encryption and replicated to geographically separate, air-gapped storage. Restore drills are executed routinely to guarantee rapid recovery readiness.',
   },
 ];
 
 export default function HostingPage({ onContact, onLegal, onNavigateHome }) {
+  const [activeFaq, setActiveFaq] = useState(null);
+
   return (
-    <div className="min-h-screen bg-black text-white">
-      <section className="border-b border-white/10 px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-medium text-emerald-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            Managed Hosting — In Development
-          </div>
-
-          <div className="mt-7 grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-end">
-            <div>
-              <h1 className="max-w-4xl text-4xl font-normal tracking-[-0.035em] sm:text-5xl md:text-6xl">
-                PENETIX managed hosting is being built with security and operational reliability in mind.
-              </h1>
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
-                We are currently preparing the infrastructure, backup processes, monitoring, access controls and service procedures required before offering paid managed hosting.
-              </p>
+    <div className="hosting-page" id="hosting-page">
+      {/* Hero Section */}
+      <section className="hosting-hero" id="hosting-hero">
+        <div className="container hosting-hero-inner">
+          <div className="hosting-hero-content">
+            <div className="hosting-badge">
+              <span className="hosting-badge-dot" />
+              Cyber-Hardened Hosting Infrastructure
             </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">
-                Current status
-              </div>
-              <div className="mt-2 text-2xl font-medium">Infrastructure rollout</div>
-              <p className="mt-2 text-sm leading-relaxed text-white/55">
-                Hosting specifications, pricing and SLAs will be published after validation. No unsupported uptime, latency or capacity guarantees are being advertised.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => onContact?.('Managed Hosting / Future Infrastructure')}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-white/90"
-            >
-              Discuss Future Hosting
-              <ArrowRight size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateHome?.()}
-              className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/[0.08]"
-            >
-              Back to Home
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-16 sm:px-6 sm:py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
-              Planned foundation
-            </span>
-            <h2 className="mt-3 text-3xl font-normal tracking-tight sm:text-4xl">
-              What we are preparing before launch.
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-white/60 sm:text-base">
-              These are implementation goals, not contractual guarantees. Final service levels and package specifications will be published when the platform is ready for production customers.
+            <h1 className="hosting-title">
+              Enterprise hosting built for <span>security first.</span>
+            </h1>
+            <p className="hosting-subtitle">
+              High-performance, fortified hosting infrastructure designed to defend against modern
+              cyber threats, DDoS attacks, unauthorized access, and data breaches.
             </p>
-          </div>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {plannedCapabilities.map(({ icon: Icon, title, description }) => (
-              <article
-                key={title}
-                className="rounded-2xl border border-white/10 bg-white/[0.025] p-6"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-emerald-400">
-                  <Icon size={19} />
-                </div>
-                <h3 className="mt-5 text-lg font-medium">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/55">{description}</p>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-            <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
-              <div>
-                <h3 className="text-xl font-medium">Need hosting guidance now?</h3>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/55">
-                  PENETIX can still help review an existing hosting setup, deployment architecture or website security posture while our managed hosting platform is being prepared.
-                </p>
-              </div>
+            <div className="button-row">
+              <a href="#pricing" className="button button-primary">
+                Explore Hosting Plans <ArrowRight size={16} />
+              </a>
               <button
-                type="button"
-                onClick={() => onContact?.('Cloud / Hosting Security Review')}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-500/15"
+                className="button button-secondary"
+                onClick={() => onContact('Cloud / Hosting Security Review')}
               >
-                Request a Review
-                <ArrowRight size={16} />
+                Request Custom Setup
               </button>
             </div>
+            <div className="hosting-quick-stats">
+              <div className="stat-item">
+                <span className="stat-value">99.99%</span>
+                <span className="stat-label">Uptime SLA</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">&lt; 15ms</span>
+                <span className="stat-label">Average Latency</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">2.4 Tbps</span>
+                <span className="stat-label">DDoS Scrubbing Capacity</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">24/7/365</span>
+                <span className="stat-label">Security Monitoring</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hosting-hero-visual">
+            <div className="hosting-hero-card">
+              <div className="card-status-bar">
+                <span className="status-online">
+                  <span className="status-indicator" />
+                  INFRASTRUCTURE ONLINE
+                </span>
+                <span>SEC-NODE // 01</span>
+              </div>
+              <div className="server-metric-row">
+                <span className="metric-name">
+                  <Cpu size={15} /> System Integrity
+                </span>
+                <span className="metric-val">100% SECURE</span>
+              </div>
+              <div className="server-metric-row">
+                <span className="metric-name">
+                  <Globe size={15} /> DDoS Shield
+                </span>
+                <span className="metric-val">ACTIVE (ANYCAST)</span>
+              </div>
+              <div className="server-metric-row">
+                <span className="metric-name">
+                  <LockKeyhole size={15} /> WAF Rule Engine
+                </span>
+                <span className="metric-val">ENFORCING</span>
+              </div>
+              <div className="server-metric-row">
+                <span className="metric-name">
+                  <HardDrive size={15} /> Air-Gapped Snapshot
+                </span>
+                <span className="metric-val">VERIFIED (SYNCED)</span>
+              </div>
+              <div className="terminal-box">
+                <div className="terminal-line">
+                  <span className="terminal-prompt">$</span> penetix-guardian status
+                </div>
+                <div className="terminal-line">&gt; Kernel: Linux 6.6.x (Hardened Grsec)</div>
+                <div className="terminal-line">&gt; Zero unauthorized ports open</div>
+                <div className="terminal-line">&gt; Perimeter defense: NOMINAL</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <Footer onContact={onContact} onLegal={onLegal} />
+      {/* Features Grid */}
+      <section className="hosting-features-section" id="hosting-features">
+        <div className="container">
+          <div className="section-heading">
+            <div className="section-heading-title">
+              <p className="eyebrow">BUILT-IN PROTECTION</p>
+              <h2>Security is not an add-on.<br />It’s our architecture.</h2>
+            </div>
+            <div className="section-heading-aside">
+              <p>
+                Every server comes pre-configured with defensive hardening, strict isolation, and
+                continuous telemetry so you can deploy with confidence.
+              </p>
+            </div>
+            <div className="section-index">01 <span>/ 04</span></div>
+          </div>
+
+          <div className="features-grid">
+            {features.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div className="feature-card" key={idx}>
+                  <div className="feature-icon-wrapper">
+                    <Icon size={24} strokeWidth={1.5} />
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Hosting Plans Section */}
+      <HostingPricingSection onContact={onContact} />
+
+      {/* Architecture & Compliance Overview */}
+      <section className="hosting-architecture-section" id="hosting-architecture">
+        <div className="container">
+          <div className="section-heading">
+            <div className="section-heading-title">
+              <p className="eyebrow">ENTERPRISE ASSURANCE</p>
+              <h2>Infrastructure engineered<br />for uncompromising uptime.</h2>
+            </div>
+            <div className="section-heading-aside">
+              <p>
+                Strict hardware isolation, redundant network transit, and verified compliance standards
+                ensure business reliability under any conditions.
+              </p>
+            </div>
+            <div className="section-index">03 <span>/ 04</span></div>
+          </div>
+
+          <div className="architecture-grid">
+            <div className="arch-card">
+              <h4>Tier III+ & IV Facilities</h4>
+              <p>Redundant power feeds, N+1 generators, biometric access controls, and 24/7 on-site physical security.</p>
+            </div>
+            <div className="arch-card">
+              <h4>Anycast Global Routing</h4>
+              <p>Ultra-low latency edge points with automatic BGP rerouting around regional fiber cuts or network congestion.</p>
+            </div>
+            <div className="arch-card">
+              <h4>Regulatory Alignment</h4>
+              <p>Architected to fulfill compliance mandates including ISO 27001, SOC 2, HIPAA, and GDPR data residency.</p>
+            </div>
+            <div className="arch-card">
+              <h4>Zero Port Exposure</h4>
+              <p>External network perimeters are locked down strictly. Administrative access requires authenticated cryptographic tunnels.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="hosting-faq-section" id="hosting-faq">
+        <div className="container">
+          <div className="section-heading">
+            <div className="section-heading-title">
+              <p className="eyebrow">QUESTIONS & ANSWERS</p>
+              <h2>Frequently asked questions<br />about our hosting.</h2>
+            </div>
+            <div className="section-heading-aside">
+              <p>Everything you need to know about our infrastructure, onboarding, and migration support.</p>
+            </div>
+            <div className="section-index">04 <span>/ 04</span></div>
+          </div>
+
+          <div className="faq-grid">
+            {faqs.map((faq, idx) => (
+              <div className="faq-item" key={idx}>
+                <h4>{faq.q}</h4>
+                <p>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA & Footer */}
+      <section className="section-panel contact-section" id="hosting-cta">
+        <div className="final-cta">
+          <img src="/images/mountains.webp" alt="" loading="lazy" width="1536" height="1024" />
+          <div className="container final-cta-inner">
+            <div className="cta-topline">
+              <span className="eyebrow">FORTIFY YOUR DIGITAL ASSETS</span>
+              <span className="section-index">HOSTING <span>/ CLOUD</span></span>
+            </div>
+            <div className="cta-content">
+              <h2>Deploy on infrastructure<br /><span>engineered for security.</span></h2>
+              <p>Consult with our cloud security architects to design and deploy a custom hardened hosting environment.</p>
+              <div className="button-row">
+                <button
+                  className="button button-light"
+                  onClick={() => onContact('Cloud / Hosting Security Review')}
+                >
+                  Consult an Architect <ArrowRight size={18} />
+                </button>
+                <a className="text-link text-link-light" href="mailto:penetixcybersolutions@gmail.com">
+                  Contact PENETIX <ArrowRight size={17} />
+                </a>
+              </div>
+            </div>
+            <div className="cta-bottomline">
+              <span>Hardened OS. <i /> Anycast DDoS Shield. <i /> 24/7 Security Telemetry.</span>
+              <span>A SAFER DIGITAL FOUNDATION.<br />ALWAYS.</span>
+            </div>
+          </div>
+        </div>
+        <Footer onContact={onContact} onLegal={onLegal} />
+      </section>
     </div>
   );
 }

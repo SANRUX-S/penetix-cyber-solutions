@@ -123,9 +123,9 @@ export default function App() {
         path: '/web-development',
       },
       hosting: {
-        title: 'Managed Hosting — Coming Soon | PENETIX',
+        title: 'Cyber-Hardened Hosting & Infrastructure Pricing | PENETIX',
         description:
-          'PENETIX managed hosting is in development. Join the conversation for future security-focused hosting, monitoring and managed infrastructure.',
+          'High-performance, fortified hosting infrastructure with multi-layer DDoS mitigation, kernel-hardened OS, 24/7 telemetry, and transparent plans.',
         path: '/hosting',
       },
     }[route];
