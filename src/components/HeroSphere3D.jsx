@@ -132,6 +132,24 @@ function ribbonPoint(longitude, across, { latitude, halfWidth, radius, rake = .1
   return new THREE.Vector3(radial * Math.sin(longitude), r * Math.sin(angle), radial * Math.cos(longitude));
 }
 
+const _tempVec = new THREE.Vector3();
+function getRibbonPointFast(longitude, across, settings, depth = 0) {
+  const { latitude, halfWidth, radius, rake = .16, phase = 0, lap = 0 } = settings;
+  const wave = rake * Math.cos(latitude) * (Math.sin(longitude + phase) + .18 * Math.sin(2 * longitude + phase));
+  const width = halfWidth * (1 + .1 * Math.sin(2 * longitude + phase));
+  const sweep = latitude + wave + across * width;
+  const aperture = .22;
+  const curved = Math.abs(latitude) < .5 && halfWidth > .05
+    ? Math.sign(latitude) * (aperture + Math.log1p(Math.exp((Math.sign(latitude) * sweep - aperture) * 22)) / 22)
+    : sweep;
+  const angle = THREE.MathUtils.clamp(curved, -Math.PI / 2 + .002, Math.PI / 2 - .002);
+  const crown = .014 * (1 - across * across);
+  const r = radius + lap * across + crown - depth;
+  const radial = r * Math.cos(angle);
+  _tempVec.set(radial * Math.sin(longitude), r * Math.sin(angle), radial * Math.cos(longitude));
+  return _tempVec;
+}
+
 function createRibbon(settings, segments, crossSegments = 16) {
   const positions = [], uvs = [], indices = [], groups = [];
   const thickness = .024, bevel = .065;
@@ -233,7 +251,11 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
     let disposed = false, lost = false, visible = false, frame = 0, previousTime = null, elapsed = 0, lastMetadata = -1, environment;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobile = window.matchMedia('(max-width: 760px)').matches;
-    const segments = mobile ? 104 : 176;
+    const isLowPower = typeof navigator !== 'undefined' && (
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (navigator.deviceMemory && navigator.deviceMemory <= 4)
+    );
+    const segments = mobile ? 104 : (isLowPower ? 144 : 176);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(31, 1, .1, 30);
     camera.position.set(0, .55, 7.25); camera.lookAt(0, -.08, 0);
@@ -422,6 +444,8 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
     const accent = new THREE.Color(), resolvingColor = new THREE.Color(0xace2d2), threatRed = new THREE.Color(0xba443b);
     const pointer = new THREE.Vector2(), pointerTarget = new THREE.Vector2();
     const pointerSurface = mount.closest('section') || mount;
+    const scanGlintSettings = { ...scanSettings, radius: 1.615 };
+    let pointerRect = null;
 
     function renderAt(time, delta = 0) {
       if (disposed || lost) return;
@@ -437,19 +461,21 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
       // Move a short luminous segment along the exact raked inlay. Rotating a
       // separate ring here would drift off the shell's security path.
       const pulsePositions = pulseGeometry.getAttribute('position');
+      const pulseStep = 0.52 / 34;
       for (let i = 0; i <= 34; i += 1) {
+        const lon = cycle * 12 + i * pulseStep;
         for (let side = 0; side < 2; side += 1) {
-          const point = ribbonPoint(cycle * 12 + i / 34 * .52, side * 2 - 1, pulseSettings);
+          const point = getRibbonPointFast(lon, side * 2 - 1, pulseSettings);
           pulsePositions.setXYZ(i * 2 + side, point.x, point.y, point.z);
         }
       }
       pulsePositions.needsUpdate = true;
-      scanGlint.position.copy(ribbonPoint(-.48 + cycle * 12, 0, { ...scanSettings, radius: 1.615 }));
+      scanGlint.position.copy(getRibbonPointFast(-.48 + cycle * 12, 0, scanGlintSettings));
       coreGroup.rotation.set(cycle * 8, -cycle * 15, cycle * 3);
       coreTraces.rotation.y = cycle * 10;
       pointer.lerp(pointerTarget, 1 - Math.exp(-delta * 4)); root.rotation.set(pointer.y * .02, pointer.x * .03, 0);
       root.position.y = reducedMotion.matches ? 0 : .025 * Math.sin(cycle * 5); shadowMaterial.opacity = .64 - root.position.y * .5;
-      accent.setRGB(...state.color); scanMaterial.color.copy(accent); scanMaterial.emissive.copy(accent);
+      accent.setRGB(state.color[0], state.color[1], state.color[2]); scanMaterial.color.copy(accent); scanMaterial.emissive.copy(accent);
       ribbonAccentMaterial.emissive.copy(accent); ribbonAccentMaterial.color.copy(accent);
       const corePower = 1.55 + .12 * Math.sin(cycle * 2) + .2 * state.defense + .12 * state.resolve;
       coreMaterial.emissive.copy(accent); coreMaterial.emissiveIntensity = .002 * corePower;
@@ -490,16 +516,17 @@ export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
       renderAt(elapsed); if (!reducedMotion.matches) frame = requestAnimationFrame(tick);
     }
     function resize() {
+      pointerRect = null;
       if (disposed || lost || !mount.clientWidth || !mount.clientHeight) return;
       renderer.setSize(mount.clientWidth, mount.clientHeight, false); camera.aspect = mount.clientWidth / mount.clientHeight; camera.zoom = Math.min(1, camera.aspect); camera.updateProjectionMatrix();
       if (!document.hidden) renderAt(elapsed);
     }
     function movePointer(event) {
       if (reducedMotion.matches || event.pointerType === 'touch') return;
-      const rect = pointerSurface.getBoundingClientRect();
-      pointerTarget.set(THREE.MathUtils.clamp((event.clientX - rect.left) / rect.width * 2 - 1, -1, 1), THREE.MathUtils.clamp((event.clientY - rect.top) / rect.height * 2 - 1, -1, 1));
+      if (!pointerRect) pointerRect = pointerSurface.getBoundingClientRect();
+      pointerTarget.set(THREE.MathUtils.clamp((event.clientX - pointerRect.left) / pointerRect.width * 2 - 1, -1, 1), THREE.MathUtils.clamp((event.clientY - pointerRect.top) / pointerRect.height * 2 - 1, -1, 1));
     }
-    function resetPointer() { pointerTarget.set(0, 0); }
+    function resetPointer() { pointerTarget.set(0, 0); pointerRect = null; }
     function motionChange() { pointer.set(0, 0); pointerTarget.set(0, 0); elapsed = 0; lastMetadata = -1; updateAnimation(); }
     function contextLost(event) { event.preventDefault(); lost = true; cancelAnimationFrame(frame); previousTime = null; mount.dataset.animation = 'paused'; setUnavailable(true); }
     function contextRestored() { if (disposed) return; refreshEnvironment(); lost = false; setUnavailable(false); resize(); updateAnimation(); }

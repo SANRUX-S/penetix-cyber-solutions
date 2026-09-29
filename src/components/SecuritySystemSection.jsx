@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import { ArrowLeft, ArrowRight, Check, Database, Fingerprint, Globe2, KeyRound, Laptop, Mail, RotateCcw } from 'lucide-react';
 import '../styles/security-system.css';
 
@@ -40,7 +40,7 @@ const securityLayers = [
   },
 ];
 
-function EngineeredCore({ activeIndex }) {
+const EngineeredCore = memo(function EngineeredCore({ activeIndex }) {
   const selected = securityLayers[activeIndex];
 
   return (
@@ -136,9 +136,9 @@ function EngineeredCore({ activeIndex }) {
       </g>
     </svg>
   );
-}
+});
 
-export default function SecuritySystemSection() {
+function SecuritySystemSection() {
   const [activeIndex, setActiveIndex] = useState(2);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
@@ -228,3 +228,5 @@ export default function SecuritySystemSection() {
     </section>
   );
 }
+
+export default memo(SecuritySystemSection);

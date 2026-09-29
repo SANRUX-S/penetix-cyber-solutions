@@ -49,10 +49,20 @@ export function SpotlightBorder({
   intensity = 0.45,
 }) {
   const containerRef = useRef(null);
+  const rectRef = useRef(null);
+
+  const handlePointerEnter = () => {
+    if (containerRef.current) {
+      rectRef.current = containerRef.current.getBoundingClientRect();
+    }
+  };
 
   const handlePointerMove = (e) => {
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    if (!rectRef.current) {
+      rectRef.current = containerRef.current.getBoundingClientRect();
+    }
+    const rect = rectRef.current;
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     containerRef.current.style.setProperty("--spot-x", `${x}px`);
@@ -60,6 +70,7 @@ export function SpotlightBorder({
   };
 
   const handlePointerLeave = () => {
+    rectRef.current = null;
     if (!containerRef.current) return;
     containerRef.current.style.setProperty("--spot-x", "-9999px");
     containerRef.current.style.setProperty("--spot-y", "-9999px");
@@ -68,6 +79,7 @@ export function SpotlightBorder({
   return (
     <div
       ref={containerRef}
+      onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       style={{

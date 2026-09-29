@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import {
   ArrowRight,
   ChevronDown,
@@ -47,7 +47,7 @@ const featuredServices = [
   },
 ];
 
-export default function Navbar({ onContact, currentRoute = 'home', onNavigate, onWebDev }) {
+function Navbar({ onContact, currentRoute = 'home', onNavigate, onWebDev }) {
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
@@ -55,27 +55,41 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
   const closeTimerRef = useRef(null);
+  const scrolledRef = useRef(false);
+  const activeRef = useRef('home');
 
   // Active section scroll tracking
   useEffect(() => {
     if (currentRoute === 'hosting') {
       setActive('hosting');
+      activeRef.current = 'hosting';
       return;
     }
     if (currentRoute === 'webdev') {
       setActive('webdev');
+      activeRef.current = 'webdev';
       return;
     }
     let pending = false;
     const update = () => {
       pending = false;
-      setScrolled(window.scrollY > 20);
+      const isScrolled = window.scrollY > 20;
+      if (scrolledRef.current !== isScrolled) {
+        scrolledRef.current = isScrolled;
+        setScrolled(isScrolled);
+      }
       if (currentRoute === 'hosting') {
-        setActive('hosting');
+        if (activeRef.current !== 'hosting') {
+          activeRef.current = 'hosting';
+          setActive('hosting');
+        }
         return;
       }
       if (currentRoute === 'webdev') {
-        setActive('webdev');
+        if (activeRef.current !== 'webdev') {
+          activeRef.current = 'webdev';
+          setActive('webdev');
+        }
         return;
       }
       const position = window.scrollY + window.innerHeight * 0.38;
@@ -85,7 +99,10 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
         const node = document.getElementById(id);
         if (node && node.offsetTop <= position) current = id;
       }
-      setActive(current);
+      if (activeRef.current !== current) {
+        activeRef.current = current;
+        setActive(current);
+      }
     };
     let frame;
     const scroll = () => {
@@ -123,7 +140,7 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousedown', handleClickOutside);
@@ -432,4 +449,6 @@ export default function Navbar({ onContact, currentRoute = 'home', onNavigate, o
     </header>
   );
 }
+
+export default memo(Navbar);
 

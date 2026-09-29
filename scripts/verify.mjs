@@ -284,9 +284,9 @@ try {
   await mkdir(outputDirectory, { recursive: true });
   const bundledBrowser = chromium.executablePath();
   const executablePath = [
-    bundledBrowser,
     'C:/Program Files/Google/Chrome/Application/chrome.exe',
     'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    bundledBrowser,
   ].find((candidate) => existsSync(candidate));
   if (!executablePath) throw new Error('No Chromium browser is installed. Install Chrome/Edge or run npx playwright install chromium.');
   results.browserExecutable = executablePath;

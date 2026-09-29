@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import Footer from './Footer.jsx';
 
-export default function FinalCTA({ onContact, onLegal }) {
+function FinalCTA({ onContact, onLegal }) {
   return (
     <section className="section-panel contact-section" id="contact" aria-labelledby="contact-title" data-section="08">
       <div className="final-cta">
@@ -29,3 +30,5 @@ export default function FinalCTA({ onContact, onLegal }) {
     </section>
   );
 }
+
+export default memo(FinalCTA);

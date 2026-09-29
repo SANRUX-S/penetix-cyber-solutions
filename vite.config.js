@@ -20,7 +20,12 @@ export default defineConfig({
         webDevelopment: path.resolve(__dirname, 'web-development.html'),
         hosting: path.resolve(__dirname, 'hosting.html'),
       },
-      output: { manualChunks: { three: ['three'] } },
+      output: {
+        manualChunks: {
+          three: ['three'],
+          framer: ['framer-motion'],
+        },
+      },
     },
   },
 });

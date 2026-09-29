@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import ServicesSection from './components/ServicesSection.jsx';
@@ -8,9 +8,10 @@ import SecurityReviewSection from './components/SecurityReviewSection.jsx';
 import WhyPenetixSection from './components/WhyPenetixSection.jsx';
 import ResourcesSection from './components/ResourcesSection.jsx';
 import FinalCTA from './components/FinalCTA.jsx';
-import HostingPage from './components/HostingPage.jsx';
-import WebDevPage from './components/WebDevPage.jsx';
-import SiteDialog from './components/SiteDialog.jsx';
+
+const HostingPage = lazy(() => import('./components/HostingPage.jsx'));
+const WebDevPage = lazy(() => import('./components/WebDevPage.jsx'));
+const SiteDialog = lazy(() => import('./components/SiteDialog.jsx'));
 
 const routeFromLocation = () => {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
@@ -46,7 +47,7 @@ export default function App() {
   const [route, setRoute] = useState(routeFromLocation);
   const [dialog, setDialog] = useState(null);
 
-  const navigate = (newRoute, targetSection) => {
+  const navigate = useCallback((newRoute, targetSection) => {
     if (newRoute === 'hosting') {
       window.history.pushState({}, '', '/hosting');
       setRoute('hosting');
@@ -79,11 +80,26 @@ export default function App() {
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
-  };
+  }, []);
 
-  const contact = (service) =>
-    setDialog({ type: 'contact', service: typeof service === 'string' ? service : undefined });
-  const openWebDev = () => navigate('webdev');
+  const contact = useCallback((service) =>
+    setDialog({ type: 'contact', service: typeof service === 'string' ? service : undefined }), []);
+  const openWebDev = useCallback(() => navigate('webdev'), [navigate]);
+  const openStory = useCallback(() => setDialog({ type: 'story' }), []);
+  const openReport = useCallback(() => setDialog({ type: 'report' }), []);
+  const openLegal = useCallback((key) => setDialog({ type: 'legal', key }), []);
+  const closeDialog = useCallback(() => setDialog(null), []);
+
+  useEffect(() => {
+    // Idle prefetch for modal dialog to eliminate opening lag
+    const prefetch = () => {
+      import('./components/SiteDialog.jsx');
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const handle = window.requestIdleCallback(prefetch, { timeout: 2500 });
+      return () => window.cancelIdleCallback(handle);
+    }
+  }, []);
 
   useEffect(() => {
     // Convert legacy hash-route links to clean paths once loaded.
@@ -194,39 +210,47 @@ export default function App() {
       />
       <main id="main-content">
         {route === 'hosting' ? (
-          <HostingPage
-            onContact={contact}
-            onLegal={(key) => setDialog({ type: 'legal', key })}
-            onNavigateHome={(targetSection) => navigate('home', targetSection)}
-          />
+          <Suspense fallback={null}>
+            <HostingPage
+              onContact={contact}
+              onLegal={openLegal}
+              onNavigateHome={(targetSection) => navigate('home', targetSection)}
+            />
+          </Suspense>
         ) : route === 'webdev' ? (
-          <WebDevPage
-            onContact={contact}
-            onLegal={(key) => setDialog({ type: 'legal', key })}
-            onNavigateHome={(targetSection) => navigate('home', targetSection)}
-          />
+          <Suspense fallback={null}>
+            <WebDevPage
+              onContact={contact}
+              onLegal={openLegal}
+              onNavigateHome={(targetSection) => navigate('home', targetSection)}
+            />
+          </Suspense>
         ) : (
           <>
-            <Hero onContact={contact} onStory={() => setDialog({ type: 'story' })} />
+            <Hero onContact={contact} onStory={openStory} />
             <ServicesSection onContact={contact} />
             <SecuritySystemSection />
             <ApproachSection />
-            <SecurityReviewSection onReport={() => setDialog({ type: 'report' })} />
+            <SecurityReviewSection onReport={openReport} />
             <WhyPenetixSection />
             <ResourcesSection />
             <FinalCTA
               onContact={contact}
-              onLegal={(key) => setDialog({ type: 'legal', key })}
+              onLegal={openLegal}
             />
           </>
         )}
       </main>
-      <SiteDialog
-        dialog={dialog}
-        onClose={() => setDialog(null)}
-        onContact={contact}
-        onNavigate={navigate}
-      />
+      {dialog && (
+        <Suspense fallback={null}>
+          <SiteDialog
+            dialog={dialog}
+            onClose={closeDialog}
+            onContact={contact}
+            onNavigate={navigate}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

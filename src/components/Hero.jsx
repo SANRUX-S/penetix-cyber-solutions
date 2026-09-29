@@ -1,8 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, memo } from 'react';
 import { ArrowRight, ArrowDown, Play, ShieldCheck, UsersRound, LockKeyhole } from 'lucide-react';
 const HeroSphere3D = lazy(() => import('./HeroSphere3D.jsx'));
 
-export default function Hero({ onContact, onStory }) {
+function Hero({ onContact, onStory }) {
   return <section className="section-panel hero" id="home" aria-labelledby="hero-title" data-section="01">
     <img className="hero-background" src="/images/hero-architecture.webp" alt="" fetchPriority="high" width="1536" height="1024" />
     <div className="hero-light" />
@@ -25,3 +25,5 @@ export default function Hero({ onContact, onStory }) {
     <div className="container hero-bottom"><a href="#services" className="scroll-cue"><span className="scroll-disc"><ArrowDown size={16} /></span>SCROLL TO EXPLORE</a><span className="technical-text">BUILT ON CLARITY. DESIGNED FOR CONFIDENCE.</span></div>
   </section>;
 }
+
+export default memo(Hero);
