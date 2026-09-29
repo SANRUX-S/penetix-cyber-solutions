@@ -234,10 +234,12 @@ const SPHERE_STYLES = `
 .penetix-security-core__fallback { position: absolute; inset: 0; display: grid; place-content: center; color: #293b43; font: 10px/1.9 sans-serif; letter-spacing: .15em; text-align: center; }
 .penetix-security-core--unavailable > canvas { opacity: 0; }
 /* Only the existing PENETIX hero uses this placement. Other parents are filled. */
-.hero-object > .penetix-security-core[data-layout="auto"] { position: absolute; width: clamp(320px, 37vw, 530px); height: clamp(320px, 37vw, 530px); right: -1%; top: 51%; transform: translateY(-50%); }
-@media (max-width: 1100px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(280px, 41vw, 480px); height: clamp(280px, 41vw, 480px); right: -2%; } }
-@media (max-width: 760px) { .hero-object > .penetix-security-core[data-layout="auto"] { position: relative; width: clamp(240px, 70vw, 345px); height: clamp(240px, 70vw, 345px); max-width: calc(100vw - 40px); right: auto; top: auto; transform: none; margin: 0 auto; } }
-@media (max-width: 430px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(220px, 65vw, 300px); height: clamp(220px, 65vw, 300px); } }
+.hero-object > .penetix-security-core[data-layout="auto"] { position: absolute; width: clamp(340px, 34vw, 500px); height: clamp(340px, 34vw, 500px); right: 36px; top: 50%; transform: translateY(-50%); }
+@media (min-width: 1600px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(400px, 33vw, 520px); height: clamp(400px, 33vw, 520px); right: 48px; } }
+@media (max-width: 1300px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(310px, 35vw, 450px); height: clamp(310px, 35vw, 450px); right: 28px; } }
+@media (max-width: 1024px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(270px, 37vw, 390px); height: clamp(270px, 37vw, 390px); right: 18px; } }
+@media (max-width: 760px) { .hero-object > .penetix-security-core[data-layout="auto"] { position: relative; width: clamp(250px, 72vw, 345px); height: clamp(250px, 72vw, 345px); max-width: calc(100vw - 40px); right: auto; top: auto; transform: none; margin: 36px auto 0; } }
+@media (max-width: 430px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(220px, 68vw, 300px); height: clamp(220px, 68vw, 300px); margin: 28px auto 0; } }
 `;
 
 export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {
