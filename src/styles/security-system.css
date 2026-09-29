@@ -141,6 +141,7 @@
   min-width: 0;
   aspect-ratio: 600 / 590;
   margin: 25px 0;
+  overflow: clip;
 }
 
 .orbit-engineering { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -345,6 +346,7 @@
   .inspector-description { min-height: 56px; }
   .orbit-stage { transform: translateX(4px); }
   .orbit-node-label { font-size: 10px; }
+  .orbit-node-left { flex-direction: row; transform: translate(-8px, -50%); }
 }
 
 @media (max-width: 600px) {
@@ -361,7 +363,7 @@
   .orbit-node-point { width: 13px; height: 13px; }
   .orbit-node-point > span { width: 4px; height: 4px; }
   .orbit-node { gap: 4px; transform: translate(-8px, -50%); }
-  .orbit-node-left { transform: translate(calc(-100% + 8px), -50%); }
+  .orbit-node-left { flex-direction: row; transform: translate(-8px, -50%); }
   .orbit-stage-caption { bottom: -13px; font-size: 6.5px; }
   .system-inspector-column { margin-top: 0; }
   .system-inspector-eyebrow { margin: 0 0 16px; font-size: 8px; }

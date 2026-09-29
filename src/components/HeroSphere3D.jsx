@@ -234,9 +234,10 @@ const SPHERE_STYLES = `
 .penetix-security-core__fallback { position: absolute; inset: 0; display: grid; place-content: center; color: #293b43; font: 10px/1.9 sans-serif; letter-spacing: .15em; text-align: center; }
 .penetix-security-core--unavailable > canvas { opacity: 0; }
 /* Only the existing PENETIX hero uses this placement. Other parents are filled. */
-.hero-object > .penetix-security-core[data-layout="auto"] { position: absolute; width: min(37vw, 530px); height: min(37vw, 530px); right: -1%; top: 51%; transform: translateY(-50%); }
-@media (max-width: 1100px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: 41vw; height: 41vw; right: -2%; } }
-@media (max-width: 760px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: min(100%, 345px); height: min(100vw - 40px, 345px); right: 50%; top: 50%; transform: translate(50%, -50%); } }
+.hero-object > .penetix-security-core[data-layout="auto"] { position: absolute; width: clamp(320px, 37vw, 530px); height: clamp(320px, 37vw, 530px); right: -1%; top: 51%; transform: translateY(-50%); }
+@media (max-width: 1100px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(280px, 41vw, 480px); height: clamp(280px, 41vw, 480px); right: -2%; } }
+@media (max-width: 760px) { .hero-object > .penetix-security-core[data-layout="auto"] { position: relative; width: clamp(240px, 70vw, 345px); height: clamp(240px, 70vw, 345px); max-width: calc(100vw - 40px); right: auto; top: auto; transform: none; margin: 0 auto; } }
+@media (max-width: 430px) { .hero-object > .penetix-security-core[data-layout="auto"] { width: clamp(220px, 65vw, 300px); height: clamp(220px, 65vw, 300px); } }
 `;
 
 export function HeroSphere3D({ className = '', style, fit = 'auto' } = {}) {

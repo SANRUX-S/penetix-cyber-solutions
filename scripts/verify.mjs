@@ -72,6 +72,7 @@ async function scrollToSection(page, id) {
 
 async function expectAnchorPosition(page, id) {
   await expect.poll(() => page.evaluate((sectionId) => {
+    if (sectionId === 'home') return window.scrollY <= 2 ? 0 : window.scrollY;
     const navbar = document.querySelector('.navbar').getBoundingClientRect();
     const section = document.getElementById(sectionId).getBoundingClientRect();
     return Math.abs(section.top - navbar.bottom);
@@ -97,7 +98,7 @@ async function verifyStructure(page) {
   await expect(page.locator('.resource-card')).toHaveCount(6);
   await expect(page.locator('.orbit-node')).toHaveCount(7);
   const links = await page.locator('nav[aria-label="Main navigation"] a').evaluateAll((anchors) => anchors.map((anchor) => anchor.getAttribute('href')));
-  assert.deepEqual(links, ['#home', '#services', '#approach', '#company', '#resources', '#contact']);
+  assert.deepEqual(links, ['#home', '#/web-development', '#/hosting', '#approach', '#resources', '#contact']);
   assert.deepEqual(await page.locator('a[href="#"], a[href="javascript:void(0)"]').count(), 0, 'No placeholder anchors should remain.');
 }
 
@@ -136,7 +137,7 @@ async function verifyWebGL(page, label) {
 
 async function verifyNavigation(page, mobile) {
   const navigation = page.getByRole('navigation', { name: 'Main navigation' });
-  for (const [id, name] of [['services', 'Services'], ['approach', 'Approach'], ['company', 'Company'], ['resources', 'Resources'], ['contact', 'Contact'], ['home', 'Home']]) {
+  for (const [id, name] of [['approach', 'Approach'], ['resources', 'Resources'], ['contact', 'Contact Us'], ['home', 'Home']]) {
     if (mobile) {
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
       await expect(page.getByRole('button', { name: 'Close navigation', exact: true })).toHaveAttribute('aria-expanded', 'true');

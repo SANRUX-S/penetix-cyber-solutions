@@ -15,14 +15,15 @@
   --muted: #5c6864;
   --line: rgba(15, 45, 38, .12);
   --max-width: 1240px;
-  --nav-height: 72px;
+  --nav-height: 54px;
   --section-space: clamp(64px, 7vw, 112px);
   --shadow: 0 8px 28px rgba(33, 45, 33, .045);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: var(--nav-height); }
-body { margin: 0; min-width: 320px; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--nav-height); overflow-x: hidden; }
+body { margin: 0; min-width: 320px; overflow-x: clip; }
+body.menu-open { overflow: hidden; }
 body, button, input, textarea, select { font-family: 'Plus Jakarta Sans', sans-serif; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; }
@@ -90,6 +91,15 @@ h2 { font-size: clamp(38px, 4.2vw, 60px); line-height: 1.08; letter-spacing: -.0
   .section-foot > span:last-child { text-align: right; }
   .button { min-height: 50px; font-size: 12px; padding: 14px 18px; gap: 14px; }
   .button-row { gap: 11px; }
+}
+@media (max-width: 980px) {
+  :root { --nav-height: 52px; }
+}
+@media (max-width: 600px) {
+  :root { --nav-height: 56px; }
+}
+@media (max-width: 480px) {
+  .container { width: calc(100% - 32px); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
