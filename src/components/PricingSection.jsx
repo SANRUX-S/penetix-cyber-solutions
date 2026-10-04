@@ -183,8 +183,9 @@ const packages = [
   {
     id: "basic",
     name: "BASIC",
-    regularPrice: "$279",
-    launchPrice: "$249",
+    regularPrice: "$299",
+    launchPrice: "$149",
+    discount: "50% OFF",
     pricePrefix: null,
     pages: "Up to 6 Pages",
     description: "Everything you need to launch a fast, secure and professional online presence.",
@@ -220,8 +221,9 @@ const packages = [
     id: "professional",
     name: "PROFESSIONAL",
     badge: "MOST POPULAR",
-    regularPrice: "$459",
-    launchPrice: "$399",
+    regularPrice: "$599",
+    launchPrice: "$299",
+    discount: "50% OFF",
     pricePrefix: null,
     pages: "Up to 11 Pages",
     description: "For growing businesses that need stronger visibility, lead generation and marketing tools.",
@@ -409,6 +411,15 @@ export function PricingCard({ plan, onContact }) {
               <span className="text-sm text-foreground/45 line-through font-mono">
                 {plan.regularPrice}
               </span>
+              {plan.discount && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
+                  </span>
+                  {plan.discount}
+                </span>
+              )}
             </div>
             <div className="mt-1 flex items-baseline gap-1.5">
               {plan.pricePrefix && (
@@ -531,7 +542,7 @@ export default function PricingSection({ onContact }) {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* SECTION HEADER */}
-        <div className="mb-14 max-w-3xl">
+        <div className="mb-10 max-w-3xl">
           <FadeUp>
             <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-landing-surface border border-white/10 px-3.5 py-1 text-xs text-foreground/80 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -551,6 +562,55 @@ export default function PricingSection({ onContact }) {
             </p>
           </FadeUp>
         </div>
+
+        {/* SPECIAL PROMOTION BANNER WITH ANIMATION */}
+        <FadeUp delay={0.15}>
+          <div className="mb-8 relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-white/[0.025] to-emerald-950/30 p-5 sm:p-6 backdrop-blur-xl shadow-[0_0_35px_rgba(16,185,129,0.12)]">
+            {/* Animated Shimmer Sweep Light */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: "200%" }}
+              transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
+              className="pointer-events-none absolute top-0 h-[2px] w-1/2 bg-gradient-to-r from-transparent via-emerald-400 to-transparent"
+            />
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-300">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                    </span>
+                    <span>SPECIAL LAUNCH PROMOTION</span>
+                  </span>
+                  <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
+                    🔥 50% FLAT DISCOUNT
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-foreground/70">
+                    Limited Project Slots
+                  </span>
+                </div>
+
+                <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                  Limited-Time Promotional Rates Active
+                </h3>
+
+                <p className="text-xs sm:text-sm text-foreground/70 max-w-2xl leading-relaxed">
+                  Special introductory launch pricing is active for Basic and Professional packages — Basic is now{" "}
+                  <strong className="text-emerald-300 font-semibold">$149 (was $299)</strong> and Professional is{" "}
+                  <strong className="text-emerald-300 font-semibold">$299 (was $599)</strong>.
+                </p>
+              </div>
+
+              <div className="shrink-0">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-4 py-2 text-xs font-bold uppercase tracking-wider text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+                  50% OFF APPLIED
+                </span>
+              </div>
+            </div>
+          </div>
+        </FadeUp>
 
         {/* 4 MAIN PRICING CARDS (1 col on mobile, 2 cols on tablet, 4 cols on desktop) */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
