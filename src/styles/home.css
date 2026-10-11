@@ -377,6 +377,53 @@
 .service-card p { color: var(--muted); font-size: 12px; line-height: 1.65; margin-bottom: 14px; }
 .service-arrow { color: #164c3e; margin-top: auto; text-align: right; line-height: 0; }
 
+.service-card-graphic {
+  padding: 0 !important;
+  min-height: auto !important;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: #080d12;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.service-card-graphic::after { display: none !important; }
+.service-card-graphic:hover {
+  transform: translateY(-6px) scale(1.018);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.38), 0 0 24px rgba(34, 197, 94, 0.18);
+  border-color: rgba(74, 222, 128, 0.45);
+}
+.service-card-graphic:focus-visible {
+  outline: 2px solid #22c55e;
+  outline-offset: 3px;
+}
+.service-card-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 11px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.service-card-graphic:hover .service-card-img {
+  transform: scale(1.02);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* 04 — A connected path */
 .approach-section { isolation: isolate; overflow: hidden; background: #f8f6f1; padding: var(--section-space) 0 32px; display: flex; }
 .approach-landscape { position: absolute; bottom: 0; width: 100%; height: 65%; object-fit: cover; opacity: .13; z-index: -2; mask-image: linear-gradient(transparent, #000 80%); }

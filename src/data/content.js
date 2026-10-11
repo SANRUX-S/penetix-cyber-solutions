@@ -1,18 +1,18 @@
 import { ShieldCheck, Layers3, Globe2, Server, Mail, KeyRound, Activity, DatabaseBackup, Cloud, Laptop, GraduationCap, Route, MessageSquare, Hexagon, LockKeyhole, ChartNoAxesColumnIncreasing } from 'lucide-react';
 
 export const services = [
-  { title: 'Security Assessment', icon: ShieldCheck, description: 'Review the current security posture and identify important weaknesses.' },
-  { title: 'Vulnerability Assessment', icon: Layers3, description: 'Identify and prioritize security weaknesses across authorized websites and systems.' },
-  { title: 'Website Security Review', icon: Globe2, description: 'Review website configuration, authentication, headers, exposed services and common security risks.' },
-  { title: 'Infrastructure Hardening', icon: Server, description: 'Improve hosting, server configurations, permissions, access controls and essential protections.' },
-  { title: 'Email Security', icon: Mail, description: 'Improve email configuration, phishing resistance and account protection.' },
-  { title: 'Account & Access Security', icon: KeyRound, description: 'Review MFA, passwords, permissions, privileged accounts and access practices.' },
-  { title: 'Security Health Check', icon: Activity, description: 'Practical review of accounts, devices, backups, hosting, email and common business security risks.' },
-  { title: 'Backup & Recovery Review', icon: DatabaseBackup, description: 'Review backup practices, restore readiness and basic recovery planning.' },
-  { title: 'Cloud / Hosting Security Review', icon: Cloud, description: 'Review supported cloud or hosting configurations for common security weaknesses.' },
-  { title: 'Device Security Review', icon: Laptop, description: 'Review basic security hygiene for business laptops and workstations including updates, encryption and access.' },
-  { title: 'Security Awareness', icon: GraduationCap, description: 'Help teams understand phishing, suspicious links, password safety and common digital threats.' },
-  { title: 'Security Improvement Roadmap', icon: Route, description: 'Turn findings into a clear prioritized plan: what to fix first, next and later.' },
+  { title: 'Security Assessment', icon: ShieldCheck, description: 'Review your current security posture and identify critical risks and gaps.', image: '/images/services/service-01.webp' },
+  { title: 'Vulnerability Assessment', icon: Layers3, description: 'Identify and prioritize security weaknesses across your systems and applications.', image: '/images/services/service-02.webp' },
+  { title: 'Website Security Review', icon: Globe2, description: 'Assess website configuration, authentication, headers and exposed services for security risks.', image: '/images/services/service-03.webp' },
+  { title: 'Infrastructure Hardening', icon: Server, description: 'Strengthen server and hosting configurations, permissions, access controls and essential protections.', image: '/images/services/service-04.webp' },
+  { title: 'Email Security', icon: Mail, description: 'Improve email configuration, phishing resistance and account protection.', image: '/images/services/service-05.webp' },
+  { title: 'Account & Access Security', icon: KeyRound, description: 'Review MFA, passwords, permissions and privileged accounts.', image: '/images/services/service-06.webp' },
+  { title: 'Security Health Check', icon: Activity, description: 'Practical review of accounts, devices, backups, hosting, email and common security risks.', image: '/images/services/service-07.webp' },
+  { title: 'Backup & Recovery Review', icon: DatabaseBackup, description: 'Review backup practices, restore readiness and basic recovery planning.', image: '/images/services/service-08.webp' },
+  { title: 'Cloud / Hosting Security Review', icon: Cloud, description: 'Review cloud or hosting configurations for common misconfigurations and risks.', image: '/images/services/service-09.webp' },
+  { title: 'Device Security Review', icon: Laptop, description: 'Review basic security hygiene for business laptops and workstations including updates, antivirus and configuration.', image: '/images/services/service-10.webp' },
+  { title: 'Security Awareness', icon: GraduationCap, description: 'Help teams understand phishing, suspicious links, password safety and common threats.', image: '/images/services/service-11.webp' },
+  { title: 'Security Improvement Roadmap', icon: Route, description: 'Turn findings into a clear, prioritized plan with practical next steps.', image: '/images/services/service-12.webp' },
 ];
 
 export const approach = [
